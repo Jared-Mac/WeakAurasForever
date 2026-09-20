@@ -12,6 +12,7 @@ local tests = {
   "aura_environment_test.lua",
   "common_options_test.lua",
   "forever_spell_cache_test.lua",
+  "forever_state_test.lua",
   "forever_trigger_options_test.lua",
 }
 

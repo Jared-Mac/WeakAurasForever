@@ -4253,10 +4253,13 @@ function Private.GetTriggerConditions(data)
         end,
 
       }
-      if WeakAuras.IsForever() and data.triggers[i].trigger.type == "forever"
-         and data.triggers[i].trigger.source ~= "ammo" and data.triggers[i].trigger.source ~= nil then
-        conditions[i].show = nil
-        conditions[i].activationTime = nil
+      if WeakAuras.IsForever() and data.triggers[i].trigger.type == "forever" then
+        if Private.Forever.IsNative(data.triggers[i].trigger) then
+          conditions[i].show = nil
+          conditions[i].activationTime = nil
+        else
+          conditions[i].show.test = Private.Forever.ActiveCondition(data, i)
+        end
       end
     end
   end

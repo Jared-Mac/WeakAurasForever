@@ -49,3 +49,11 @@ Put shared WoW stubs in `wow_stubs.lua`. Keep them to what the loaded files
 touch. Write a new `*_test.lua` that requires `helpers` and `wow_stubs`, loads
 the addon file with `T.loadAddonFile`, states expectations with `T.expect`,
 and ends with `T.finish()`. Then add the file name to the list in `run.lua`.
+
+Forever source expansion tests use narrow API fixtures and the real registered
+provider lifecycle. They cover unknown/inverse behavior, restriction transitions,
+public flags with protected-time sentinels, range nil, effect sets, numeric
+boundaries, event timers, rename/unload and event-versus-poll routing. Options
+tests build real flattened panels, exercise category/source/picker setters and
+evaluate each source's visible controls. They do not emulate native WoW frames,
+AceGUI drawing, restrictions or rendering; these still need client verification.

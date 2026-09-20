@@ -35,6 +35,7 @@ globals = {
 	"OKAY",
 
 	-- Forever restricted-value access
+	"canaccesstable",
 	"canaccessvalue",
 	"issecretvalue",
 
@@ -1050,6 +1051,7 @@ globals = {
 	"C_Scenario.IsInScenario",
 	"C_Scenario.ShouldShowCriteria",
 	"C_Scenario.TreatScenarioAsDungeon",
+	"C_Secrets",
 	"C_SharedCharacterServices",
 	"C_SharedCharacterServices.AssignUpgradeDistribution",
 	"C_SharedCharacterServices.GetLastSeenUpgradePopup",
@@ -1086,6 +1088,8 @@ globals = {
 	"C_Spell.GetSchoolString",
 	"C_Spell.GetSpellCooldown",
 	"C_Spell.GetSpellInfo",
+	"C_SpellActivationOverlay",
+	"C_SpellBook",
 	"C_StorePublic",
 	"C_StorePublic.IsDisabledByParentalControls",
 	"C_StorePublic.IsEnabled",

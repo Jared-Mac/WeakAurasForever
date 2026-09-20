@@ -10,6 +10,94 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## General trigger expansion: forever.4
+
+The Trigger tab now has six categories (Spell, Aura, Item, Unit, Player & World,
+Timer) and 23 sources. The single-entry Type dropdown is replaced by Category;
+persisted trigger type remains `forever`. Track lists only the chosen category.
+Spell inputs include a picker backed by the bounded player spellbook cache,
+plus an exact ID field. The effect-list picker appends IDs without duplicates.
+
+- Spell: native cooldown/charge-recharge icons; public cooldown-active,
+  cooldown-inactive, cooldown-on-hold and recharging checks; learned spells,
+  usability/insufficient-resource, range, and Blizzard proc highlights.
+- Aura: native player/target buff or debuff icons; separately, public exact-ID
+  presence checks over up to 32 IDs with Any/All and present/missing choices.
+  Presence checks accept any caster; no owner-specific inference is made.
+- Item: equipped ammo, general carried/equipped item counts (not banks), and
+  whether an item is equipped. Numeric sources support comparisons and percent
+  thresholds. Previous ammo `lowOnly` settings remain effective until edited.
+- Unit: player/target/focus/pet existence, dead/ghost, attackability, friendship,
+  and connectivity. Non-existence does not prove another unit predicate false.
+- Player & World: combat, mounted, resting, swimming, dead/ghost, pet, group/raid;
+  class, level, XP, money in gold, form/stance index, group size, zone and instance type.
+  Form means stance-bar index, not hunter-aspect presence. Solo group size is one.
+- Timer: main/off-hand/ranged swings, and configurable fixed timers started by
+  entering combat, a readable successful player cast, or `/waf timer KEY`.
+  `/waf stop KEY` cancels matching manual timers. These are not cooldown inference.
+
+Use **Add Trigger → Required for Activation: All / Any** to combine checks.
+**Show when: Condition is false** inverts a readable check. **Always, while data
+is available** retains a boolean source for styling through Conditions.
+Native sources remain display bindings: their slot eligibility is not buff
+presence. Their Active/Since Active conditions remain hidden. Cooldown flags
+are separately exposed; active includes GCD, inactive excludes held cooldowns,
+and neither implies that all cast requirements are met. No numeric protected
+cooldown times or current charge counts enter WA state.
+
+Unknown is not false. Protected effect policies, inaccessible fields, missing
+APIs, invalid range checks and invisible targets cannot activate an inverse
+check. Restriction-transition events invalidate presence observations before
+restrictions activate; a subsequent poll performs a fresh check. Active=false
+and Source-is-true=false conditions also require a known observation. Custom
+Lua combinations remain user-authored code over WA's boolean activation array;
+use the built-in per-source inversion for unknown-aware behavior.
+
+The existing runtime entry point is `system.Add` -> load/unload hooks -> event
+updates -> `Private.UpdatedTriggerState`. Per-trigger contexts own parsed IDs,
+metadata and public timers; contexts are not serialized. Event subscriptions
+come from source definitions. Only range/presence/state/timer sources poll (5 Hz),
+only while such sources are loaded, and unchanged observations do not republish
+states. Inventory and cooldown sources are event-driven. Unload/delete clear
+observations and timers; rename moves them. Edit/reload resets event timers.
+Core Resume forces a fresh publication after editor fake states. Live fallback
+states now use real readable values instead of the old fixed editor samples.
+
+`Private.GetTriggerConditions` preserves upstream behavior outside Forever,
+uses the provider's unknown-aware Active check for ordinary Forever sources,
+and keeps Active/Since Active hidden for native sources. The Condition tab,
+All/Any combination UI, progress sources and text fields remain the upstream
+systems. Ordinary boolean sources use WA's zero-duration status representation,
+so icons do not acquire a fabricated one-second cooldown.
+
+### Try it
+
+1. `/reload`, then `/wa`. In Trigger, choose Category, Track, and the relevant
+   item/spell/state. Use Conditions for extra color/text/glow rules.
+2. Optional: `/waf examples` creates the original three examples plus low ammo
+   AND combat, ranged swing, a manual timer, and a missing-aspect reminder.
+   Existing names are kept. Nothing is created automatically during installation.
+3. Close the editor, then `/waf timer demo`; the example should count down for
+   ten seconds. `/waf stop demo` cancels it. Test the swing bar by shooting.
+4. Set the low-ammo example threshold above the current count, enter/leave
+   combat, and verify All gating. Then change All to Any to check the difference.
+5. The aspect example lists Monkey 13163 and Hawk 13165; edit IDs for your ranks.
+   Toggle an aspect out of combat, then enter combat. Restricted checks must
+   hide the reminder rather than incorrectly report that the aspect is missing.
+6. Check a native target debuff, cooldown/recharge icon, range, usability and
+   proc source with the relevant spell/class. Test source switching, duplicate,
+   rename, delete, export/import, reload and relog.
+
+Source contracts: Blizzard's pinned Forever UI at
+`4d5d706b8e01c5ebe01c8dd9b7a07151d8d37069`, generated Spell/SpellShared,
+SpellBook, Item, Unit, PlayerScript, Instance, SecretPredicateAPI,
+RestrictedActions, SwingTimer and SpellActivationOverlay documentation, plus
+`Blizzard_CustomAuraContainer.lua` (`SetUnit`, `SetAuraSlotFilterString`,
+`SetAuraSlotCandidateFilters`). Wiki API pages returned HTTP 403; the local
+exact-build source is the primary evidence. These contracts support the
+implementation, but the newly added sources still require native-client tests.
+Previously confirmed ammo/native cooldown behavior is not proof of every source.
+
 ## Trigger-tab follow-up: forever.3
 
 The next native run opened the editor and showed the examples, then selecting
@@ -65,7 +153,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.3.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.4.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.
@@ -84,7 +172,7 @@ AurasForever can remain installed. Restart WoW once to discover new addons.
    Shoot, change stacks, and unequip/re-equip ammo. In Trigger, enable **Only
    show when ammunition is low** and change **Show at or below** to test hiding.
 5. Create another Icon or Progress Bar through the normal New menu. The default
-   trigger is Forever > Equipped ammunition. Choose a native source only for an
+   trigger is Item > Equipped ammunition. Choose a native source only for an
    Icon. Try Conditions > Ammo count, multiple public ammo conditions, rename,
    duplicate, delete, reload and a full relog. Export the examples before relog
    if retaining edits matters; the beta's earlier persistence issue is not
@@ -107,9 +195,10 @@ disable the four WeakAuras addons. `/af` continues to use AurasForever separatel
   the live display. Conditions expose count and availability.
 - Cooldown icons use `C_Spell.GetSpellCooldownDuration(id, true)` and
   `Cooldown:SetCooldownFromDurationObject`, with GCD ignored. The engine receives
-  no numeric cooldown duration, readiness, stacks or expiration time. Charge
-  rendering and cooldown progress bars are not implemented yet.
-- Buff icons use `CustomAuraContainerTemplate`, an exact player buff spell-ID
+  no numeric game cooldown duration, current charge count or expiration time.
+  Recharge icons and public status flags are supported; native cooldown progress
+  bars are not implemented yet.
+- Buff icons use `CustomAuraContainerTemplate`, an exact player/target buff or debuff spell-ID
   filter, and native icon/cooldown bindings. The engine does not read native
   occupancy, texture, visibility, stacks or timer values to reconstruct state.
   This does not provide missing-buff conditions during restrictions. There is
@@ -170,11 +259,12 @@ startup, editor or rendering behavior.
   actual Trigger-tab options through the Forever provider and shared helpers.
 - `git diff --check` and Lua 5.1 parsing of modified source files.
 
-The local runs passed: 92 upstream assertions, 16 spell-cache regression checks,
-17 trigger-options checks, 25 Forever adapter/lifecycle checks,
-and 234 packaged load dependencies. Luacheck is not installed.
+The forever.4 local runs passed: 92 upstream assertions, 16 spell-cache
+regression checks, 75 trigger-options checks and 110 Forever source/lifecycle/
+slash-command checks (293 total). Packaging verifies 234 load dependencies and
+Lua 5.1 syntax. Luacheck is not installed.
 
-The forever.2 screenshot confirms that the editor opens, and identifies the
-Trigger-tab failure corrected in forever.3. Native retesting of that correction
-and broader display behavior is pending. Capture the first Lua error or crash
+The forever.2 screenshot confirms that the editor opens. The subsequent
+forever.3 screenshot shows the repaired Trigger tab. Native verification of the
+new forever.4 sources and broader display behavior is pending. Capture the first Lua error or crash
 report if another compatibility issue occurs.

@@ -80,7 +80,7 @@ T.expect(panel.args[header(2)].name == "Trigger 2: Equipped ammunition", "new tr
 data.triggers[1].trigger.event = "Health"
 data.triggers[1].trigger.source = "buff"
 panel = optionsPrivate.GetTriggerOptions(data)
-T.expect(panel.args[header(1)].name == "Trigger 1: Player buff (native)", "ignores stale legacy event metadata for Forever")
+T.expect(panel.args[header(1)].name == "Trigger 1: Buff / debuff display (native)", "ignores stale legacy event metadata for Forever")
 local before = updates
 panel.args["trigger.1.forever.source"].set(nil, "cooldown")
 panel = optionsPrivate.GetTriggerOptions(data)
@@ -100,4 +100,69 @@ for _, item in ipairs({{"aura2", "Aura"}, {"custom", "Custom"}, {"unit", "Health
   T.expect(optionsPrivate.GetTriggerTitle(data, 1) == "Trigger 1: " .. item[2], "preserves " .. item[1] .. " heading")
 end
 T.expect(optionsPrivate.GetTriggerTitle(data, 3) == "Trigger 3", "missing trigger slot keeps the existing generic heading")
+T.section("Category controls, focused fields and persisted settings")
+WeakAuras.class_types = {HUNTER = "Hunter", MAGE = "Mage"}
+WeakAuras.spellCache = {Get = function() return {
+  ["Raptor Strike"] = {spells = "2973=132223"},
+  ["Aspect of the Monkey"] = {spells = "13163=132159"}
+} end}
+C_Spell = {GetSpellName = function() return "Raptor Strike" end}
+issecretvalue = function() return false end
+canaccessvalue = function() return true end
+GetRealZoneText = function() return "Teldrassil" end
+local function control(key) return panel.args["trigger.1.forever." .. key] end
+local function rebuild() panel = optionsPrivate.GetTriggerOptions(data) end
+data.triggers = {{trigger = {type = "forever", source = "ammo", lowOnly = true, threshold = 42}}}
+rebuild()
+T.expect(control("category").get() == "item", "existing ammo opens in Item")
+T.expect(control("compare").get() == "<=" and control("threshold").get() == "42", "legacy low-only threshold appears unchanged")
+T.expect(control("source").values().ammo and not control("source").values().buff, "Track lists only the selected category")
+T.expect(control("spellID").hidden() and not control("threshold").hidden(), "ammo exposes relevant inputs")
+control("compare").set(nil, "always")
+rebuild()
+T.expect(data.triggers[1].trigger.lowOnly == nil and control("threshold").hidden(), "disabling legacy low-only removes the old constraint")
+control("category").set(nil, "spell")
+rebuild()
+T.expect(data.triggers[1].trigger.type == "forever" and control("source").get() == "cooldown", "category change keeps the persisted provider and selects a source")
+T.expect(control("showWhen").hidden() and not control("spellID").hidden(), "native display exposes no presence show/hide setting")
+local book = control("spellbook").values()
+T.expect(book[2973] == "Raptor Strike (2973)" and book[13163], "picker uses cached spellbook entries and IDs")
+control("spellbook").set(nil, 2973)
+T.expect(data.triggers[1].trigger.spellID == 2973, "picker writes the ID through the editor update path")
+control("category").set(nil, "aura")
+rebuild()
+control("source").set(nil, "aura_presence")
+rebuild()
+control("spellbook").set(nil, 13163)
+rebuild()
+control("spellbook").set(nil, 13163)
+T.expect(data.triggers[1].trigger.spellIDs == "2973, 13163", "effect picker appends and deduplicates IDs")
+T.expect(control("showWhen").values()["false"] == "None of the effects are present", "Any inverse clearly says none present")
+control("auraMatch").set(nil, "all")
+rebuild()
+T.expect(control("showWhen").values()["false"] == "At least one effect is missing", "All inverse clearly says at least one missing")
+T.expect(control("spellIDs").validate(nil, "bad") ~= true, "invalid effect lists are rejected")
+control("category").set(nil, "item")
+rebuild()
+control("compare").set(nil, "<=")
+rebuild()
+T.expect(control("threshold").validate(nil, "0") == true and control("threshold").validate(nil, "-1") ~= true, "threshold accepts zero and rejects negatives")
+control("threshold").set(nil, "12.5")
+T.expect(data.triggers[1].trigger.threshold == 12.5, "threshold is persisted as a number")
+-- Build and evaluate every visible source's controls through the actual flattening
+-- layer. The spellbook fixture is the same name/spells shape produced by Cache.
+for source in pairs(private.Forever.sources) do
+  data.triggers[1].trigger = {type = "forever", source = source, spellID = 2973}
+  rebuild()
+  local success, err = pcall(function()
+    for key, option in pairs(panel.args) do
+      if key:find("trigger.1.forever.", 1, true) == 1 and not (type(option.hidden) == "function" and option.hidden()) then
+        for _, property in ipairs({"get", "name", "values", "desc"}) do
+          if type(option[property]) == "function" then option[property]() end
+        end
+      end
+    end
+  end)
+  T.expect(success, "visible controls evaluate for " .. source .. (err and ": " .. tostring(err) or ""))
+end
 T.finish()
