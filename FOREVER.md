@@ -10,12 +10,39 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Crash follow-up: forever.2
+
+The first native run reached the options spell-cache worker and then WoW build
+69913 crashed (2026-09-20 22:47:59 UTC). The report names ERROR #110 in
+`PlayerConditions_C.cpp:763`: aura 1251678 referenced by player condition 144600
+was unknown to the client. Its Lua stack shows the WeakAuras coroutine scheduler
+resuming `spellCache`, with the last yield label `spells`. The exact spell ID
+being queried is not present in the report; the referenced aura ID need not be
+that queried ID. There was no systemd core or kernel OOM/GPU error in that window.
+
+The inherited `WeakAurasOptions/Cache.lua` builder queried successive spell IDs
+through its entire database range. `WeakAuras.ShowOptions` starts that worker on
+first open. Forever now takes an early branch that reads only the player's
+reported `C_SpellBook` skill-line slot ranges and uses each entry's existing
+name, spell ID and icon metadata. It does not call general spell metadata APIs
+or schedule the legacy worker. Names/ranks keep the upstream cache format.
+
+Opening the editor rebuilds this small cache so learned/removed abilities are
+reflected. Loading options discards any partial or previous full-database search
+cache; aura definitions and other settings are untouched. Name searches now
+cover the character's spellbook. Explicit spell-ID lookups remain available;
+this change does not guarantee that all IDs in the beta database are valid.
+
+This removes the automatic lookup path present at the crash. Confirmation that
+`/wa` now opens without a native assertion still requires a client retest. Start
+with `/wa`, then use `/waf test` if the editor opens successfully.
+
 ## Install and test
 
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.1.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.2.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.
@@ -113,12 +140,16 @@ startup, editor or rendering behavior.
   native timing data. Its access-check sentinels do not emulate WoW's secret VM.
 - `python3 tools/build_forever.py`: recursive packaged load-file existence and
   Lua 5.1 syntax; includes embedded libraries without modifying them.
+- `tests/forever_spell_cache_test.lua` (included in `tests/run.lua`): real cache
+  load/build/picker-lookup path, with metadata fixtures and tripwires against
+  full-database queries or worker scheduling; also checks the Classic branch.
 - `git diff --check` and Lua 5.1 parsing of modified source files.
 
-The local runs passed: 92 upstream assertions, 25 Forever adapter/lifecycle checks,
+The local runs passed: 92 upstream assertions, 16 spell-cache regression checks,
+25 Forever adapter/lifecycle checks,
 and 234 packaged load dependencies. Luacheck is not installed.
 
-Native client testing is pending. In particular, this experiment has not yet
-proved that the full upstream AceGUI editor and all shared display code run
-unchanged on this beta. Capture the first Lua error if startup or `/wa` fails;
-that is the next compatibility boundary to address.
+Native retesting of forever.2 is pending. The first run established that startup
+reached the options spell-cache worker, where it crashed; it did not prove the
+full editor or shared display code. Capture the first Lua error or crash report
+if startup or `/wa` fails again.

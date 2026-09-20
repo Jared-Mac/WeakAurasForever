@@ -8,6 +8,9 @@ that the escape routes we have found and closed stay closed:
   `WeakAuras.LoadFunction` cannot reach the real global table, the blocked WoW
   functions, or the data-changing WeakAuras API, and that legitimate lookups
   such as anchoring to a child frame without a name keep working.
+- `forever_spell_cache_test.lua` checks the options cache's Forever branch using
+  bounded spellbook fixtures. General metadata queries and background sweeps
+  fail the test. It also verifies the original Classic worker still runs.
 - `common_options_test.lua` checks that the options panel evaluates stored
   custom code only inside the sandbox when it renders the error label under a
   code box.

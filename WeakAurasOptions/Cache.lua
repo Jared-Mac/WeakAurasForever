@@ -21,11 +21,50 @@ local cache
 local metaData
 local bestIcon = {}
 
+-- Forever build 69913 asserted in PlayerConditions_C.cpp while the legacy
+-- spellCache coroutine probed the full ID space. Only enumerate actual player
+-- spellbook slots; their metadata already provides names, IDs and icons.
+local function BuildForeverSpellCache()
+  local entries, seen = {}, {}
+  local bank = Enum.SpellBookSpellBank.Player
+  for lineIndex = 1, C_SpellBook.GetNumSpellBookSkillLines() do
+    local line = C_SpellBook.GetSpellBookSkillLineInfo(lineIndex)
+    if line then
+      for slot = line.itemIndexOffset + 1, line.itemIndexOffset + line.numSpellBookItems do
+        local info = C_SpellBook.GetSpellBookItemInfo(slot, bank)
+        if info and info.itemType == Enum.SpellBookItemType.Spell
+           and info.spellID and info.name ~= "" and info.iconID and not seen[info.spellID] then
+          seen[info.spellID] = true
+          local entry = entries[info.name]
+          local spell = info.spellID .. "=" .. info.iconID
+          if entry then
+            entry.spells = entry.spells .. "," .. spell
+          else
+            entries[info.name] = {spells = spell}
+          end
+        end
+      end
+    end
+  end
+  wipe(cache)
+  wipe(bestIcon)
+  for name, entry in pairs(entries) do cache[name] = entry end
+  metaData.needsRebuild = false
+  metaData.rebuilding = false
+end
+
 -- Builds a cache of name/icon pairs from existing spell data
 -- This is a rather slow operation, so it's only done once, and the result is subsequently saved
 function spellCache.Build()
   if not cache then
     error("spellCache has not been loaded. Call WeakAuras.spellCache.Load(...) first.")
+  end
+
+  if WeakAuras.IsForever() then
+    -- ShowOptions calls Build on every open, keeping learned/removed spells
+    -- current without scheduling a background database sweep.
+    BuildForeverSpellCache()
+    return
   end
 
   if not metaData.needsRebuild then
@@ -238,6 +277,22 @@ function spellCache.Load(data)
   local _, build = GetBuildInfo();
   local locale = GetLocale();
   local version = WeakAuras.versionString
+
+  if WeakAuras.IsForever() then
+    -- Discard a persisted whole-database or interrupted cache on upgrade.
+    -- It must not feed the icon picker before the first spellbook rebuild.
+    wipe(cache)
+    wipe(bestIcon)
+    metaData.build = build
+    metaData.locale = locale
+    metaData.version = version
+    metaData.spellCacheSource = "player-spellbook"
+    metaData.spellCacheAchievements = false
+    metaData.spellCacheStrings = true
+    metaData.needsRebuild = true
+    metaData.rebuilding = false
+    return
+  end
 
   local num = 0;
   for i,v in pairs(cache) do
