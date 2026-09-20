@@ -39,7 +39,6 @@ local private = {
   end
 }
 local optionsPrivate = {
-  Private = private,
   IsCollapsed = function(_, _, _, default) return default end,
   SetCollapsed = function() end,
   MoveCollapseDataUp = function() end,
@@ -51,7 +50,19 @@ end
 T.loadAddonFile("WeakAuras/ForeverState.lua", "WeakAuras", private)
 T.loadAddonFile("WeakAurasOptions/CommonOptions.lua", "WeakAurasOptions", optionsPrivate)
 T.loadAddonFile("WeakAurasOptions/TriggerOptions.lua", "WeakAurasOptions", optionsPrivate)
-T.loadAddonFile("WeakAurasOptions/ForeverTrigger.lua", "WeakAurasOptions", optionsPrivate)
+T.section("Options addon loads before ToggleOptions connects runtime data")
+-- LoadOptions calls LoadAddOn first; only after every chunk loads does
+-- ToggleOptions assign OptionsPrivate.Private. Registration itself uses the
+-- runtime's global RegisterTriggerSystemOptions API and needs no injected table.
+local loaded, loadError = pcall(T.loadAddonFile, "WeakAurasOptions/ForeverTrigger.lua", "WeakAurasOptions", optionsPrivate)
+if not T.expect(loaded, "provider registers while OptionsPrivate.Private is unset") then
+  print(tostring(loadError))
+  T.finish()
+end
+T.expect(optionsPrivate.Private == nil, "loading the provider does not initialize the options runtime")
+T.expect(type(private.triggerTypesOptions.forever) == "function", "provider is registered before first open")
+-- Model just the assignment boundary in ToggleOptions, not the frame runtime.
+optionsPrivate.Private = private
 local data = {id = "test", triggers = {{trigger = {type = "forever", source = "ammo"}}},
               conditions = {}, subRegions = {}}
 T.section("Forever providers reach the real shared Trigger tab builder")

@@ -10,6 +10,27 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Options initialization fix: forever.5
+
+The first native run of forever.4 reported
+`WeakAurasOptions/ForeverTrigger.lua:5: attempt to index field 'Private' (a nil value)`.
+`Private.LoadOptions` calls `C_AddOns.LoadAddOn("WeakAurasOptions")`, which executes
+all options files. Only after loading returns does `WeakAuras.OpenOptions` call
+`WeakAuras.ToggleOptions(msg, Private)`, assigning `OptionsPrivate.Private`.
+The new file-scope alias read that table too early and aborted registration.
+
+The alias now lives inside the options builder, which runs after the runtime is
+connected. No nil fallback or early return masks the missing registration. The
+options regression fixture previously injected Private before loading files;
+it now loads the real provider with Private absent, verifies registration, then
+connects Private before building and exercising all source panels. It reproduced
+the exact line-5 error before the fix and passes afterward.
+
+The fix affects only the Forever options provider. Runtime triggers, aura data,
+and the TOC load sequence are unchanged. Reload, open `/wa`, select an example,
+and open Trigger to verify the six categories in the native client. The existing
+examples can be used directly; recreating them is unnecessary.
+
 ## General trigger expansion: forever.4
 
 The Trigger tab now has six categories (Spell, Aura, Item, Unit, Player & World,
@@ -153,7 +174,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.4.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.5.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.
@@ -259,9 +280,9 @@ startup, editor or rendering behavior.
   actual Trigger-tab options through the Forever provider and shared helpers.
 - `git diff --check` and Lua 5.1 parsing of modified source files.
 
-The forever.4 local runs passed: 92 upstream assertions, 16 spell-cache
-regression checks, 75 trigger-options checks and 110 Forever source/lifecycle/
-slash-command checks (293 total). Packaging verifies 234 load dependencies and
+The forever.5 local runs passed: 92 upstream assertions, 16 spell-cache
+regression checks, 78 trigger-options checks and 110 Forever source/lifecycle/
+slash-command checks (296 total). Packaging verifies 234 load dependencies and
 Lua 5.1 syntax. Luacheck is not installed.
 
 The forever.2 screenshot confirms that the editor opens. The subsequent

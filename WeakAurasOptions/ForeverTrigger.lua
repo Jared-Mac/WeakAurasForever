@@ -2,9 +2,10 @@
 if not WeakAuras.IsLibsOK() then return end
 local OptionsPrivate = select(2, ...)
 local L = WeakAuras.L
-local F = OptionsPrivate.Private.Forever
 
 local function options(data, index)
+  -- ToggleOptions connects the runtime after this load-on-demand file loads.
+  local F = OptionsPrivate.Private.Forever
   local trigger = data.triggers[index].trigger
   local function source() return trigger.source or "ammo" end
   local function definition() return F.Source(trigger) or {} end
