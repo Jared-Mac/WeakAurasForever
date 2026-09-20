@@ -28,6 +28,12 @@ file after its dependencies.
 - Most runtime files use `local Private = select(2, ...)` for internal state
   shared across files. Put public addon APIs on `WeakAuras` and internal APIs
   on `Private`. Do not create another global.
+- `OptionsPrivate.Private` is assigned by `WeakAuras.ToggleOptions` only after
+  `C_AddOns.LoadAddOn("WeakAurasOptions")` finishes loading the options files.
+  Options files may register builders at file scope, but must defer access to
+  the runtime table until those builders run after the assignment. Options tests
+  must load these files with `OptionsPrivate.Private` unset, then connect it
+  before constructing controls.
 - `WeakAuras/Types.lua` and the per-client `WeakAuras/Types_*.lua` files fill
   `Private` with shared option data, such as value lists and their localized
   display names. Each `.toc` loads the flavor file before `Types.lua`. Keep
