@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -8,7 +9,7 @@ local OptionsPrivate = select(2, ...)
 local pairs, error, coroutine = pairs, error, coroutine
 
 -- WoW APIs
-local IsSpellKnown = IsSpellKnown
+local IsSpellKnown = WeakAuras.IsForever() and C_SpellBook.IsSpellKnownOrInSpellBook or IsSpellKnown
 
 ---@class WeakAuras
 local WeakAuras = WeakAuras

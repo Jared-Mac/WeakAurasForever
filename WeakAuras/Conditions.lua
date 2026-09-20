@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -705,7 +706,11 @@ local globalConditions =
     type = "bool",
     events = {"PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED"},
     globalStateUpdate = function(state)
-      state.incombat = UnitAffectingCombat("player");
+      if WeakAuras.IsForever() then
+        state.incombat = InCombatLockdown()
+      else
+        state.incombat = UnitAffectingCombat("player")
+      end
     end
   },
   ["hastarget"] = {
@@ -739,6 +744,10 @@ local globalConditions =
     type = "alwaystrue"
   }
 }
+
+if WeakAuras.IsForever() then
+  globalConditions = {incombat = globalConditions.incombat, alwaystrue = globalConditions.alwaystrue}
+end
 
 function Private.GetGlobalConditions()
   return globalConditions;

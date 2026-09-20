@@ -34,6 +34,10 @@ globals = {
 	"Constants",
 	"OKAY",
 
+	-- Forever restricted-value access
+	"canaccessvalue",
+	"issecretvalue",
+
 	-- misc custom
 	"AceGUIWeakAurasMultiLineEditBoxInsertLink",
 	"AceGUIWeakAurasMultiLineEditBoxWithEnterInsertLink",

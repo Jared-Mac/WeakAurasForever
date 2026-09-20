@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -134,7 +135,7 @@ local function AddOptions(allOptions, data)
           {
             trigger =
             {
-              type = "aura2"
+              type = WeakAuras.IsForever() and "forever" or "aura2"
             },
             untrigger = {
             }

@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: WeakAuras Archive
+## Author: The WeakAuras Team
+## Version: 5.22.0-forever.1
+## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
+## LoadOnDemand: 1
+## SavedVariables: WeakAurasArchive
+## LoadSavedVariablesFirst: 1
+## Dependencies: WeakAuras
