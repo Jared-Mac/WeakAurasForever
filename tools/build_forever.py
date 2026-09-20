@@ -10,7 +10,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '5.22.0-forever.2'
+VERSION = '5.22.0-forever.3'
 URL = 'https://github.com/WeakAuras/WeakAuras2/releases/download/5.22.0/WeakAuras-5.22.0.zip'
 SHA256 = '298d3cbaa129af3e734f5bd4f87911acab9b10f10d079004b770fa43980cd4a9'
 PACKAGES = ('WeakAuras', 'WeakAurasOptions', 'WeakAurasArchive', 'WeakAurasModelPaths')

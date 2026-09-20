@@ -10,6 +10,29 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Trigger-tab follow-up: forever.3
+
+The next native run opened the editor and showed the examples, then selecting
+Triggers raised `TriggerOptions.lua:307`, indexing a nil `event_prototype`.
+`GetTriggerOptions` invokes the registered Forever provider, which calls
+`AddTriggerMetaFunctions`; that calls the shared `GetTriggerTitle` helper.
+The helper assumed every non-aura/non-custom trigger belonged to the legacy
+event-prototype registry. Forever sources deliberately use a separate provider
+and have no such prototype.
+
+`GetTriggerTitle` now resolves Forever headings from its source-name table,
+including ammunition as the default for newly added triggers. Legacy trigger
+headings retain their previous behavior. Conditions and dynamic-text headings
+use the same helper and receive the correction too. No aura migration or
+saved-variable edit is needed.
+
+The focused regression test loads the actual shared option builders and Forever
+provider. It reproduced the screenshot's line-307 failure before the patch and
+passes 17 checks after it, including changing source through the real setter,
+adding a trigger through the actual button callback, and reordering. This tests
+option construction, not native AceGUI rendering. Retest with `/reload`, `/wa`,
+and the Trigger tab on each example; also check Conditions on Ammunition.
+
 ## Crash follow-up: forever.2
 
 The first native run reached the options spell-cache worker and then WoW build
@@ -42,7 +65,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.2.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.3.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.
@@ -143,13 +166,15 @@ startup, editor or rendering behavior.
 - `tests/forever_spell_cache_test.lua` (included in `tests/run.lua`): real cache
   load/build/picker-lookup path, with metadata fixtures and tripwires against
   full-database queries or worker scheduling; also checks the Classic branch.
+- `tests/forever_trigger_options_test.lua` (included in `tests/run.lua`): builds
+  actual Trigger-tab options through the Forever provider and shared helpers.
 - `git diff --check` and Lua 5.1 parsing of modified source files.
 
 The local runs passed: 92 upstream assertions, 16 spell-cache regression checks,
-25 Forever adapter/lifecycle checks,
+17 trigger-options checks, 25 Forever adapter/lifecycle checks,
 and 234 packaged load dependencies. Luacheck is not installed.
 
-Native retesting of forever.2 is pending. The first run established that startup
-reached the options spell-cache worker, where it crashed; it did not prove the
-full editor or shared display code. Capture the first Lua error or crash report
-if startup or `/wa` fails again.
+The forever.2 screenshot confirms that the editor opens, and identifies the
+Trigger-tab failure corrected in forever.3. Native retesting of that correction
+and broader display behavior is pending. Capture the first Lua error or crash
+report if another compatibility issue occurs.

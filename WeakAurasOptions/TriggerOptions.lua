@@ -296,14 +296,16 @@ function OptionsPrivate.GetTriggerTitle(data, triggernum)
   if data.triggers[triggernum] then
     local trigger = data.triggers[triggernum].trigger
     if trigger then
-      local event_prototype = OptionsPrivate.Private.event_prototypes[trigger.event]
       local triggerType = trigger.type
       local name
       if triggerType == "aura2" then
         name = L["Aura"]
       elseif triggerType == "custom" then
         name = L["Custom"]
+      elseif triggerType == "forever" and WeakAuras.IsForever() then
+        name = OptionsPrivate.Private.Forever.sourceNames[trigger.source or "ammo"] or L["Forever"]
       else
+        local event_prototype = OptionsPrivate.Private.event_prototypes[trigger.event]
         name = event_prototype.name
       end
       return L["Trigger %i: %s"]:format(triggernum, name)

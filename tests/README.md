@@ -8,6 +8,9 @@ that the escape routes we have found and closed stay closed:
   `WeakAuras.LoadFunction` cannot reach the real global table, the blocked WoW
   functions, or the data-changing WeakAuras API, and that legitimate lookups
   such as anchoring to a child frame without a name keep working.
+- `forever_trigger_options_test.lua` builds the real Trigger-tab option tables
+  through the Forever provider and shared helper functions. It covers title
+  dispatch, new triggers, source edits and reordering without emulating AceGUI.
 - `forever_spell_cache_test.lua` checks the options cache's Forever branch using
   bounded spellbook fixtures. General metadata queries and background sweeps
   fail the test. It also verifies the original Classic worker still runs.
