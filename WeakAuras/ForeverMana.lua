@@ -65,9 +65,12 @@ function F.BindMana(region, data)
   end
   local function style()
     local orientation = region.effectiveOrientation or "HORIZONTAL"
-    native:SetOrientation(orientation:find("VERTICAL", 1, true) and "VERTICAL" or "HORIZONTAL")
+    local vertical = orientation:find("VERTICAL", 1, true) ~= nil
+    native:SetOrientation(vertical and "VERTICAL" or "HORIZONTAL")
     native:SetReverseFill(orientation:find("INVERSE", 1, true) ~= nil)
-    native:SetRotatesTexture(true)
+    -- Native StatusBar rotation is explicit; unlike WA's Lua bar it does not
+    -- mean "automatically rotate when vertical". Horizontal textures stay flat.
+    native:SetRotatesTexture(vertical)
     native:SetFrameLevel(region:GetFrameLevel())
     Private.SetTextureOrAtlas(native.texture, region.bar:GetStatusBarTexture())
     local r = region.color_anim_r or region.color_r

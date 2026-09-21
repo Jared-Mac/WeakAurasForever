@@ -10,6 +10,28 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Mana texture orientation: forever.7
+
+The first Hunter-group screenshot shows full mana (376 / 376) with bands of
+different blue brightness. `ForeverMana.lua` unconditionally enabled the native
+StatusBar's texture rotation. The selected Blizzard texture is a shaded 64x8
+image; rotating it on a horizontal bar stretches its short-axis shading across
+the bar's width. WA's Lua bar has different rotation semantics: its true flag
+selects orientation-aware UV mapping, including normal UVs for horizontal bars.
+
+The native renderer now enables rotation only for vertical orientations. Reverse
+fill remains independent. This matches the native StatusBar convention used by
+[TellMeWhen's bar view](https://github.com/ascott18/TellMeWhen/blob/master/Components/IconViews/Bar/Bar.lua)
+and [ElvUI's aura bars](https://github.com/tukui-org/ElvUI/blob/main/ElvUI/Game/Shared/Modules/Auras/Auras.lua).
+The source texture was inspected from
+[the extracted Classic UI assets](https://github.com/Gethe/wow-ui-textures/blob/classic/TARGETINGFRAME/UI-StatusBar.PNG).
+
+No preset or saved aura fields change. Reload applies the renderer correction
+to existing mana bars. Local tests, Lua 5.1 parsing and the complete package
+load-graph check pass; native visual confirmation after reload remains pending.
+The Blizzard texture retains its intended shading across the bar's thickness.
+For completely flat color, choose Display > Bar Texture > Solid.
+
 ## Hunter group and native mana: forever.6
 
 After reload, run `/waf hunter` out of combat. This explicitly creates one
@@ -253,7 +275,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.6.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.7.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.
