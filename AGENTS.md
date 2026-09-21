@@ -52,6 +52,11 @@ file after its dependencies.
 - A runtime region or subregion change often needs a matching change in
   `WeakAurasOptions/RegionOptions/` or `WeakAurasOptions/SubRegionOptions/`.
   Check both sides before you finish.
+- An aurabar's `region.bar` is a Frame with Lua methods and texture masks, not
+  a native StatusBar. When adapting it to native rendering, verify each setter's
+  implementation and semantics instead of assuming matching method names are
+  interchangeable. Its rotation flag, for example, controls orientation-aware
+  UV mapping; native StatusBar rotation is explicit.
 - When changing per-aura state, check both rename and deletion in
   `WeakAuras/WeakAuras.lua`. Keep cached UI rows consistent with the state,
   use the existing lifecycle hooks, and respect their `.toc` load order.
