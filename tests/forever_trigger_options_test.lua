@@ -160,6 +160,19 @@ rebuild()
 T.expect(control("threshold").validate(nil, "0") == true and control("threshold").validate(nil, "-1") ~= true, "threshold accepts zero and rejects negatives")
 control("threshold").set(nil, "12.5")
 T.expect(data.triggers[1].trigger.threshold == 12.5, "threshold is persisted as a number")
+control("source").set(nil, "mana")
+data.regionType = "aurabar"
+rebuild()
+T.expect(control("nativeWarning").hidden() and control("spellID").hidden() and control("compare").hidden(),
+  "native mana on a bar hides irrelevant spell and threshold inputs")
+control("manaText").set(nil, false)
+rebuild()
+T.expect(data.triggers[1].trigger.manaText == false and control("manaTextSize").hidden(),
+  "native mana text visibility survives the shared getter/setter path")
+data.regionType = "icon"
+rebuild()
+T.expect(not control("nativeWarning").hidden() and control("nativeWarning").name():find("Progress Bar"),
+  "choosing mana on an icon explains the required display type")
 -- Build and evaluate every visible source's controls through the actual flattening
 -- layer. The spellbook fixture is the same name/spells shape produced by Cache.
 for source in pairs(private.Forever.sources) do

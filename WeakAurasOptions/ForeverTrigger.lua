@@ -128,6 +128,15 @@ local function options(data, index)
       values = {cooldown = L["Spell cooldown"], charges = L["Charge recharge"]},
       hidden = only("cooldown"), get = function() return trigger.nativeTimer or "cooldown" end
     },
+    manaText = {
+      type = "toggle", name = L["Show current / maximum mana"], order = 4,
+      hidden = only("mana"), get = function() return trigger.manaText ~= false end
+    },
+    manaTextSize = {
+      type = "range", name = L["Mana text size"], order = 4.1, min = 8, max = 32, step = 1,
+      hidden = function() return source() ~= "mana" or trigger.manaText == false end,
+      get = function() return trigger.manaTextSize or 12 end
+    },
     cooldownState = {
       type = "select", name = L["Check"], order = 4, width = "full", values = F.cooldownStates,
       hidden = only("cooldown_state"), get = function() return trigger.cooldownState or "active" end
@@ -225,7 +234,9 @@ local function options(data, index)
       type = "description", order = 8, width = "full",
       name = function()
         local kind = source()
-        if kind == "buff" then
+        if kind == "mana" then
+          return L["Display only · Progress Bar required. Blizzard renders player mana and the optional current / maximum text directly. Mana values do not enter WA conditions or dynamic text. Size, texture, color, gradient, orientation and inverse fill work; progress overlays, spark and foreground-relative anchors are not supported. Add ordinary text for labels."]
+        elseif kind == "buff" then
           return L["Display only · Icon required. Blizzard controls this effect's visibility and timer. Extra WA text and borders do not follow buff visibility. For present/missing conditions, choose the separate presence source; restricted data cannot drive those conditions."]
         elseif kind == "cooldown" then
           return L["Native timer · Icon required. Keep Display > Cooldown enabled. Conditions can use cooldown-active, enabled and recharging flags. Numeric remaining time and current charge counts are not exposed. Use one native display source per icon."]
@@ -262,8 +273,11 @@ local function options(data, index)
     },
     nativeWarning = {
       type = "description", order = 2.1, width = "full",
-      hidden = function() return not F.IsNative(trigger) or data.regionType == "icon" end,
-      name = L["This source needs an Icon display. For a bar or text display, choose a public state or timer source."]
+      hidden = function() return not F.IsNative(trigger) or data.regionType == F.NativeRegion(trigger) end,
+      name = function()
+        return source() == "mana" and L["This source needs a Progress Bar display."]
+          or L["This source needs an Icon display. For a bar or text display, choose a public state or timer source."]
+      end
     }
   }
   -- Category replaces the single-entry legacy Type dropdown. Persisted trigger

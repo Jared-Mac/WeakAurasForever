@@ -14,6 +14,10 @@ that the escape routes we have found and closed stay closed:
 - `forever_spell_cache_test.lua` checks the options cache's Forever branch using
   bounded spellbook fixtures. General metadata queries and background sweeps
   fail the test. It also verifies the original Classic worker still runs.
+- `forever_hunter_test.lua` checks the explicit Hunter preset against spellbook
+  metadata, rank selection, geometry, group membership and preservation of user
+  edits/deletions. Native mana sink recorders check that opaque inputs are only
+  forwarded to Blizzard setters; they do not emulate secret values or rendering.
 - `common_options_test.lua` checks that the options panel evaluates stored
   custom code only inside the sandbox when it renders the error label under a
   code box.

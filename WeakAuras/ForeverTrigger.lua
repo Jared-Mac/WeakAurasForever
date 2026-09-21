@@ -87,14 +87,19 @@ function system.Add(data)
   definitions[data.id] = next(triggers) and triggers or nil
   F.observations[data.id] = nil
   local nativeCount = 0
-  for _, entry in pairs(triggers) do
-    if F.IsNative(entry.trigger) then nativeCount = nativeCount + 1 end
-  end
   local message
-  if nativeCount > 0 and data.regionType ~= "icon" then
-    message = L["Native cooldown and buff sources require an Icon in this prototype."]
-  elseif nativeCount > 1 then
-    message = L["Use one native cooldown or buff source per icon in this prototype."]
+  for _, entry in pairs(triggers) do
+    local required = F.NativeRegion(entry.trigger)
+    if required then
+      nativeCount = nativeCount + 1
+      if data.regionType ~= required then
+        message = required == "aurabar" and L["Native mana requires a Progress Bar display."]
+          or L["Native cooldown and buff sources require an Icon in this prototype."]
+      end
+    end
+  end
+  if nativeCount > 1 then
+    message = L["Use one native display source per aura in this prototype."]
   end
   Private.AuraWarnings.UpdateWarning(data.uid, "forever-source", "warning", message)
   updatePolling()
@@ -355,6 +360,8 @@ SlashCmdList.WEAKAURASFOREVER = function(input)
   local command, key = input:match("^(%S+)%s*(.-)$")
   if command == "timer" or command == "stop" then
     refresh(nil, command == "timer" and "FOREVER_TIMER" or "FOREVER_TIMER_STOP", key ~= "" and key or "timer")
+  elseif command == "hunter" then
+    F.HunterCommand(key)
   elseif input == "test" or input == "examples" then
     if InCombatLockdown() or not WeakAuras.IsLoginFinished() then
       WeakAuras.prettyPrint(L["Wait until login completes and leave combat before creating test auras."])
@@ -368,6 +375,6 @@ SlashCmdList.WEAKAURASFOREVER = function(input)
     WeakAuras.prettyPrint(L["Test auras created. Open /wa to edit them. Existing test auras were kept."])
     WeakAuras.OpenOptions()
   else
-    WeakAuras.prettyPrint(L["Forever: /wa opens the editor. /waf examples adds examples without replacing existing auras. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
+    WeakAuras.prettyPrint(L["Forever: /wa opens the editor. /waf hunter creates your Hunter group; /waf hunter validate checks it. /waf examples adds examples. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
   end
 end

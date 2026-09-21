@@ -60,6 +60,8 @@ F.sources = {
     events = "PLAYER_EQUIPMENT_CHANGED GET_ITEM_INFO_RECEIVED"},
   unit_state = {name = L["Unit state"], category = "unit", kind = "bool", poll = true,
     events = "PLAYER_TARGET_CHANGED PLAYER_FOCUS_CHANGED UNIT_PET UNIT_FLAGS UNIT_FACTION UNIT_CONNECTION"},
+  mana = {name = L["Player mana (native bar)"], category = "unit", kind = "native",
+    events = "UNIT_POWER_FREQUENT UNIT_POWER_UPDATE UNIT_MAXPOWER UNIT_DISPLAYPOWER"},
   player_state = {name = L["Player state"], category = "player", kind = "bool", poll = true,
     events = "PLAYER_MOUNT_DISPLAY_CHANGED PLAYER_UPDATE_RESTING PLAYER_ALIVE PLAYER_DEAD PLAYER_UNGHOST GROUP_ROSTER_UPDATE UNIT_PET"},
   class = {name = L["Player class"], category = "player", kind = "bool", events = ""},
@@ -103,6 +105,9 @@ function F.Source(trigger) return F.sources[trigger.source or "ammo"] end
 function F.IsNative(trigger)
   local definition = F.Source(trigger)
   return definition and definition.kind == "native"
+end
+function F.NativeRegion(trigger)
+  if F.IsNative(trigger) then return trigger.source == "mana" and "aurabar" or "icon" end
 end
 
 function F.ClassToken()
@@ -269,7 +274,12 @@ function F.MakeState(trigger, preview, context)
   if not definition then return state end
   local source, value = trigger.source or "ammo"
   if definition.kind == "native" then
-    state.available = F.SpellID(trigger) ~= nil
+    if source == "mana" then
+      state.available = type(UnitPowerPercent) == "function" and type(UnitPower) == "function"
+        and type(UnitPowerMax) == "function"
+    else
+      state.available = F.SpellID(trigger) ~= nil
+    end
     state.show = state.available
     if source == "cooldown" then cooldownFlags(trigger, state) end
   elseif definition.kind == "timed" then

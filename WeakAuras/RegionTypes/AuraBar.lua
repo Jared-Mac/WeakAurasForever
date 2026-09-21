@@ -1222,6 +1222,7 @@ end
 
 -- Modify a given region/display
 local function modify(parent, region, data)
+  if WeakAuras.IsForever() then Private.Forever.UnbindMana(region) end
   region.timer = nil
   region.text = nil
   region.stacks = nil
@@ -1409,6 +1410,7 @@ local function modify(parent, region, data)
   region.bar:Update();
 
   Private.regionPrototype.modifyFinish(parent, region, data);
+  if WeakAuras.IsForever() then Private.Forever.BindMana(region, data) end
 end
 
 local function validate(data)

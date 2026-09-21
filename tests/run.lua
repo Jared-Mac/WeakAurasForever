@@ -14,6 +14,7 @@ local tests = {
   "forever_spell_cache_test.lua",
   "forever_state_test.lua",
   "forever_trigger_options_test.lua",
+  "forever_hunter_test.lua",
 }
 
 local interpreter = arg[-1]

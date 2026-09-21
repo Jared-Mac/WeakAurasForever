@@ -10,6 +10,85 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Hunter group and native mana: forever.6
+
+After reload, run `/waf hunter` out of combat. This explicitly creates one
+movable **Forever Hunter** group with a blue mana bar (current / maximum text),
+a thin gold ranged-swing bar, and an unlabeled row of native cooldown icons.
+Hunter abilities precede the Night Elf racials, with a wider gap between them.
+The group is anchored to screen center at Y -160; children follow the group.
+
+The character's saved, bounded spellbook cache from build 69913 confirms:
+
+| Ability | Learned IDs | Selected from current cache |
+| --- | --- | --- |
+| Arcane Shot | 3044, 14281 | 14281 |
+| Concussive Shot | 5116 | 5116 |
+| Distracting Shot | 20736 | 20736 |
+| Raptor Strike | 2973, 14260 | 14260 |
+| Elune's Light | 1259799 | 1259799 |
+| Shadowmeld | 20580 | 20580 |
+
+Creation enumerates only the current player's documented skill-line slot
+ranges, ignores passive/off-spec/future-spell entries, selects the highest
+learned rank, and skips unlearned abilities. It never scans arbitrary spell IDs.
+These are the core cooldowns available to this character now, not an endgame
+Hunter package. Each icon requires Hunter class and that spell being learned.
+No numeric cooldowns are inferred; the existing native duration-object binding
+provides the swipe and Blizzard countdown.
+
+`/waf hunter` preserves an existing group, including deleted children and edited
+positions. It does not backfill on login, reload, or another command invocation.
+Unrelated child-name collisions receive a numeric suffix. Creation uses the
+normal `WeakAuras.Add` lifecycle; no SavedVariables files are edited externally.
+Use `/waf hunter validate` for a read-only check of the current group membership,
+trigger support, native display types, and cooldown IDs against the live
+spellbook. This structural check does not prove combat rendering or persistence.
+
+### Why mana needs a separate renderer
+
+`RegionTypes/AuraBar.lua` implements its fill using Lua arithmetic and texture
+masks, so protected mana cannot be passed to that bar's `SetValue`. The new
+Unit > Player mana (native bar) source binds an actual Blizzard StatusBar,
+passing `UnitPowerPercent("player", 0, false)` directly to the native setter.
+`UnitPower` and `UnitPowerMax` go directly to `FontString:SetFormattedText`.
+The target client's generated API declares both setters as accepting secret
+arguments when tainted. No current/max/percent mana enters WA states, conditions,
+dynamic text formatters, frame-size calculations or comparisons.
+
+Binding happens after normal aurabar modification and subregion setup. Before
+the next modify, all wrapped writers are restored and the native bar is hidden,
+covering source edits and pooled region reuse. Mana updates follow power events
+through the existing Forever provider. They do not add per-frame polling.
+The bar retains size, anchors, texture, color/gradient, orientation, inversion
+(using Blizzard's curve evaluator), native smoothing, and ordinary text labels.
+Spark, progress overlays and foreground-relative anchors are unsupported for
+this native source. Its built-in mana text toggle and size are in Trigger.
+Editor preview uses explicit samples; closing the editor resumes real values.
+
+Validation: local tests cover bounded spellbook selection/ranks, parent/child
+membership, non-overlapping layout, no-overwrite behavior, unavailable spells,
+opaque-value forwarding, writer restoration, native-source event routing and
+the actual Trigger-tab builders. The eight definitions also round-tripped
+field-for-field through the packaged LibSerialize/LibDeflate import format,
+using the actual saved character spellbook cache. A backup import string is
+available at `.release/Forever-Hunter.txt`; `/waf hunter` is preferred because
+it selects spells from the live spellbook at creation time.
+These fixtures do not emulate the secret VM,
+native frames, combat, or AceGUI. Build validation parses the complete Forever
+load graph with Lua 5.1. Native-client acceptance still needs:
+
+1. `/reload`, `/waf hunter`; check eight children and six correct spell icons.
+2. Close `/wa`. Spend/regenerate mana out of combat and while shooting; compare
+   the mana number and fill to the player frame. The gold bar starts after a
+   ranged swing and hides when its public timer expires.
+3. Use the six abilities when applicable; compare swipes/countdowns with the
+   action bar, especially both racial cooldowns. The native binding ignores GCD.
+4. Move the group, edit colors/sizes, switch mana to a public source and back,
+   reopen/close the editor, and run `/waf hunter validate`.
+5. Export the group, then test reload/relog. The beta's existing persistence
+   issue is not claimed fixed by this change.
+
 ## Options initialization fix: forever.5
 
 The first native run of forever.4 reported
@@ -27,7 +106,7 @@ connects Private before building and exercising all source panels. It reproduced
 the exact line-5 error before the fix and passes afterward.
 
 The fix affects only the Forever options provider. Runtime triggers, aura data,
-and the TOC load sequence are unchanged. Reload, open `/wa`, select an example,
+and the TOC load sequence are unchanged in that fix. Reload, open `/wa`, select an example,
 and open Trigger to verify the six categories in the native client. The existing
 examples can be used directly; recreating them is unnecessary.
 
@@ -174,7 +253,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.5.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.6.zip`.
 
 Install the four directories into Forever's Interface/AddOns. They use the
 standard WeakAuras names and cannot coexist with a different WeakAuras install.

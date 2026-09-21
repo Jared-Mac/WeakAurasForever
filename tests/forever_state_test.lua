@@ -395,3 +395,32 @@ for _, example in pairs(examples) do
   end
 end
 print(checks .. " total Forever checks including slash commands and example preservation passed")
+
+-- Mana is an event-driven display binding; values and conditions stay outside
+-- WA state even when the API would return inaccessible values.
+env.UnitPowerPercent = function() error("Trigger state must not read native mana") end
+env.UnitPower = env.UnitPowerPercent
+env.UnitPowerMax = env.UnitPowerPercent
+local manaAura = {id = "Mana", uid = "Mana", regionType = "aurabar", triggers = {
+  {trigger = {type = "forever", source = "mana"}}
+}}
+system.Add(manaAura)
+system.LoadDisplays({Mana = true})
+system.FinishLoadUnload()
+check(states.Mana[1][""].show and states.Mana[1][""].count == nil)
+before = updates.Mana
+eventCallback(nil, "UNIT_POWER_UPDATE", "player", "MANA")
+check(updates.Mana == before + 1)
+check(next(system.GetTriggerConditions(manaAura, 1)) == nil)
+local sources = {}
+system.GetProgressSources(manaAura, 1, sources)
+check(next(sources) == nil)
+system.UnloadDisplays({Mana = true})
+before = updates.Mana
+eventCallback(nil, "UNIT_POWER_UPDATE", "player", "MANA")
+check(updates.Mana == before)
+local hunterCommand
+F.HunterCommand = function(command) hunterCommand = command end
+env.SlashCmdList.WEAKAURASFOREVER("hunter validate")
+check(hunterCommand == "validate")
+print(checks .. " total Forever checks including native mana and Hunter command routing passed")
