@@ -18,6 +18,12 @@ ships five addon packages:
 - `WeakAurasArchive/` is the load-on-demand saved-variable container for the
   archive.
 
+For Forever, `tools/build_forever.py` maps these source directories to the WAF
+packages described in `FOREVER.md`. Derive addon metadata, loading and event
+identity from the actual addon name. Named frames, public Lua APIs and media
+paths have different compatibility requirements; do not rename them with one
+global text substitution.
+
 The `.toc` files define the load order. Treat this order as an API. When you
 add, remove, or move a Lua file, update every relevant `.toc` file and put the
 file after its dependencies.
@@ -65,6 +71,12 @@ file after its dependencies.
 
 `WeakAurasSaved` and `WeakAurasArchive` survive addon reloads. Imported and
 exported display data also crosses addon versions.
+
+WAF uses its own SavedVariables files and globals, with legacy runtime aliases.
+Its data-only compatibility addons load the previous fork's saved globals.
+An existing WAF table, including an empty table, always takes precedence over
+legacy data. Preserve the complete table on first adoption; never backfill
+individual auras during migration or login.
 
 - Treat persisted table shapes, absent fields, `nil`, and `false` as public
   compatibility behavior.
