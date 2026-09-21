@@ -423,4 +423,12 @@ local hunterCommand
 F.HunterCommand = function(command) hunterCommand = command end
 env.SlashCmdList.WEAKAURASFOREVER("hunter validate")
 check(hunterCommand == "validate")
+local opened, forwarded = 0
+env.WeakAuras.OpenOptions = function() opened = opened + 1 end
+env.SlashCmdList.WEAKAURAS = function(input) forwarded = input end
+env.SlashCmdList.WEAKAURASFOREVER("")
+env.SlashCmdList.WEAKAURASFOREVER("   ")
+check(opened == 2)
+env.SlashCmdList.WEAKAURASFOREVER("minimap")
+check(forwarded == "minimap")
 print(checks .. " total Forever checks including native mana and Hunter command routing passed")

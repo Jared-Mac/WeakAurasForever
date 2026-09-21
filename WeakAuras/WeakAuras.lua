@@ -25,7 +25,7 @@ local debugstack = debugstack
 local GetNumTalentTabs, GetNumTalents = GetNumTalentTabs, GetNumTalents
 local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 20
 
-local ADDON_NAME = "WeakAuras"
+local ADDON_NAME = AddonName
 ---@class WeakAuras
 local WeakAuras = WeakAuras
 local L = WeakAuras.L
@@ -144,7 +144,7 @@ do
 end
 
 function Private.LoadOptions(msg)
-  if not(C_AddOns.IsAddOnLoaded("WeakAurasOptions")) then
+  if not(C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "Options")) then
     if not WeakAuras.IsLoginFinished() then
       prettyPrint(Private.LoginMessage())
       loginQueue[#loginQueue + 1] = WeakAuras.OpenOptions
@@ -155,7 +155,7 @@ function Private.LoadOptions(msg)
       Private.frames["Addon Initialization Handler"]:RegisterEvent("PLAYER_REGEN_ENABLED")
       return false;
     else
-      local loaded, reason = C_AddOns.LoadAddOn("WeakAurasOptions");
+      local loaded, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "Options");
       if not(loaded) then
         reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
         WeakAuras.prettyPrint(string.format(L["Options could not be loaded, the addon is %s"], reason));
@@ -1111,7 +1111,7 @@ local function tooltip_draw(isAddonCompartment, blizzardTooltip)
     tooltip = GameTooltip
   end
   tooltip:ClearLines()
-  tooltip:AddDoubleLine("WeakAuras", versionString)
+  tooltip:AddDoubleLine(WeakAuras.displayName, versionString)
   if Private.CompanionData.slugs then
     local count = Private.CountWagoUpdates()
     if count > 0 then
@@ -1160,7 +1160,7 @@ end
 local Broker_WeakAuras;
 Broker_WeakAuras = LDB:NewDataObject("WeakAuras", {
   type = "launcher",
-  text = "WeakAuras",
+  text = WeakAuras.displayName,
   icon = "Interface\\AddOns\\WeakAuras\\Media\\Textures\\icon.blp",
   OnClick = function(self, button)
     if button == 'LeftButton' then
@@ -1219,12 +1219,15 @@ do -- Archive stuff
     if Archivist:IsInitialized() then
       return Archivist
     else
-      if not C_AddOns.IsAddOnLoaded("WeakAurasArchive") then
-        local ok, reason = C_AddOns.LoadAddOn("WeakAurasArchive")
+      if not C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "Archive") then
+        local ok, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "Archive")
         if not ok then
           reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
           error(string.format(L["Could not load WeakAuras Archive, the addon is %s"], reason))
         end
+      end
+      if WeakAuras.IsForever() then
+        WeakAurasArchive = WeakAuras.ForeverSavedVariables("Archive", WeakAurasArchive)
       end
       if type(WeakAurasArchive) ~= "table" then
         WeakAurasArchive = {}
@@ -1365,6 +1368,9 @@ end
 loadedFrame:SetScript("OnEvent", function(self, event, ...)
   if(event == "ADDON_LOADED") then
     if(... == ADDON_NAME) then
+      if WeakAuras.IsForever() then
+        WeakAurasSaved = WeakAuras.ForeverSavedVariables("Saved", WeakAurasSaved)
+      end
       ---@type WeakAurasSaved
       WeakAurasSaved = WeakAurasSaved or {};
       db = WeakAurasSaved;

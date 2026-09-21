@@ -1,18 +1,18 @@
 ## Interface: 16001
-## Title: WeakAuras Model Paths
-## Author: The WeakAuras Team
-## Version: 5.22.0-forever.7
+## Title: WAF Model Paths
+## Author: WAF contributors; The WeakAuras Team (upstream)
+## Version: 5.22.0-waf.1
 ## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
-## Notes: Model paths for WeakAuras
-## Notes-esES: Las rutas de modelos para WeakAuras
-## Notes-esMX: Las rutas de modelos para WeakAuras
-## Notes-deDE: 3D-Model Pfade für WeakAuras
-## Notes-ruRU: Ссылки на файлы моделей WeakAuras
-## Notes-zhTW: WeakAuras的模組路徑
+## Notes: Model paths for WAF
+## Notes-esES: Las rutas de modelos para WAF
+## Notes-esMX: Las rutas de modelos para WAF
+## Notes-deDE: 3D-Model Pfade für WAF
+## Notes-ruRU: Ссылки на файлы моделей WAF
+## Notes-zhTW: WAF的模組路徑
 ## X-Category: Interface Enhancements
-## Globe-Main: WeakAuras
+## Globe-Main: WAF
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
-## Dependencies: WeakAuras, WeakAurasOptions
+## Dependencies: WAF, WAFOptions
 
 ModelPathsClassicEra.lua

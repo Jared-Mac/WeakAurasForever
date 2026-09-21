@@ -12,6 +12,7 @@ C_AddOns = {GetAddOnEnableState = function() return 0 end}
 Enum = {AddOnEnableState = {None = 0}}
 local updates = 0
 WeakAuras = {
+  addonName = "WAF",
   IsLibsOK = function() return true end,
   IsForever = function() return true end,
   L = setmetatable({}, {__index = function(_, key) return key end}),

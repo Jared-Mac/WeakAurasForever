@@ -18,6 +18,9 @@ that the escape routes we have found and closed stay closed:
   metadata, rank selection, geometry, group membership and preservation of user
   edits/deletions. Native mana sink recorders check that opaque inputs are only
   forwarded to Blizzard setters; they do not emulate secret values or rendering.
+- `forever_saved_variables_test.lua` checks WAF's save-selection boundary:
+  first migration, fresh installs, new saves taking precedence and preservation
+  of deletions. It does not emulate WoW's dependency or SavedVariables loader.
 - `common_options_test.lua` checks that the options panel evaluates stored
   custom code only inside the sandbox when it renders the error label under a
   code box.

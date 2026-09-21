@@ -1,20 +1,20 @@
 ## Interface: 16001
-## Title: WeakAuras Options
-## Author: The WeakAuras Team
-## Version: 5.22.0-forever.7
+## Title: WAF Options
+## Author: WAF contributors; The WeakAuras Team (upstream)
+## Version: 5.22.0-waf.1
 ## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
-## Notes: Options for WeakAuras
-## Notes-esES: Opciones para WeakAuras
-## Notes-esMX: Opciones para WeakAuras
-## Notes-deDE: Optionen für WeakAuras
-## Notes-ruRU: Опции WeakAuras
-## Notes-zhTW: WeakAuras的設定
+## Notes: Options for WAF
+## Notes-esES: Opciones para WAF
+## Notes-esMX: Opciones para WAF
+## Notes-deDE: Optionen für WAF
+## Notes-ruRU: Опции WAF
+## Notes-zhTW: WAF的設定
 ## X-Category: Interface Enhancements
-## Globe-Main: WeakAuras
+## Globe-Main: WAF
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
-## Dependencies: WeakAuras
-## SavedVariables: WeakAurasOptionsSaved
+## Dependencies: WAF, WeakAurasOptions
+## SavedVariables: WAFOptionsSaved
 ## LoadSavedVariablesFirst: 1
 
 embeds.xml

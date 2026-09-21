@@ -20,7 +20,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 ---@class WeakAuras
 local WeakAuras = WeakAuras
 local L = WeakAuras.L
-local ADDON_NAME = "WeakAurasOptions";
+local ADDON_NAME = AddonName;
 
 local displayButtons = {};
 OptionsPrivate.displayButtons = displayButtons;
@@ -194,6 +194,9 @@ loadedFrame:SetScript("OnEvent", function(self, event, addon)
   if (event == "ADDON_LOADED") then
     if(addon == ADDON_NAME) then
       db = WeakAurasSaved;
+      if WeakAuras.IsForever() then
+        WeakAurasOptionsSaved = WeakAuras.ForeverSavedVariables("OptionsSaved", WeakAurasOptionsSaved)
+      end
       WeakAurasOptionsSaved = WeakAurasOptionsSaved or {};
 
       odb = WeakAurasOptionsSaved;
@@ -1714,8 +1717,8 @@ function OptionsPrivate.OpenIconPicker(baseObject, paths, groupIcon)
 end
 
 function OptionsPrivate.OpenModelPicker(baseObject, path)
-  if not(C_AddOns.IsAddOnLoaded("WeakAurasModelPaths")) then
-    local loaded, reason = C_AddOns.LoadAddOn("WeakAurasModelPaths");
+  if not(C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "ModelPaths")) then
+    local loaded, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "ModelPaths");
     if not(loaded) then
       reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
       WeakAuras.prettyPrint(string.format(L["ModelPaths could not be loaded, the addon is %s"], reason));
@@ -1731,8 +1734,8 @@ function OptionsPrivate.OpenCodeReview(data)
 end
 
 function OptionsPrivate.OpenTriggerTemplate(data, targetId)
-  if not(C_AddOns.IsAddOnLoaded("WeakAurasTemplates")) then
-    local loaded, reason = C_AddOns.LoadAddOn("WeakAurasTemplates");
+  if not(C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "Templates")) then
+    local loaded, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "Templates");
     if not(loaded) then
       reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
       WeakAuras.prettyPrint(string.format(L["Templates could not be loaded, the addon is %s"], reason));

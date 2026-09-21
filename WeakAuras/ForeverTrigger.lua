@@ -356,9 +356,12 @@ end
 
 -- Registered on the existing slash dispatcher table; no new global table.
 SLASH_WEAKAURASFOREVER1 = "/waf"
+SLASH_WEAKAURASFOREVER2 = "/weakaurasforever"
 SlashCmdList.WEAKAURASFOREVER = function(input)
   local command, key = input:match("^(%S+)%s*(.-)$")
-  if command == "timer" or command == "stop" then
+  if not command then
+    WeakAuras.OpenOptions()
+  elseif command == "timer" or command == "stop" then
     refresh(nil, command == "timer" and "FOREVER_TIMER" or "FOREVER_TIMER_STOP", key ~= "" and key or "timer")
   elseif command == "hunter" then
     F.HunterCommand(key)
@@ -372,9 +375,12 @@ SlashCmdList.WEAKAURASFOREVER = function(input)
     testAura(L["Forever test - Aspect of the Monkey"], "icon", "buff", 0, -160)
     testAura(L["Forever test - Ammunition"], "aurabar", "ammo", 0, -210)
     Private.ScanForLoads()
-    WeakAuras.prettyPrint(L["Test auras created. Open /wa to edit them. Existing test auras were kept."])
+    WeakAuras.prettyPrint(L["Test auras created. Open /waf to edit them. Existing test auras were kept."])
     WeakAuras.OpenOptions()
+  elseif command == "help" then
+    WeakAuras.prettyPrint(L["WAF: /waf opens the editor. /waf hunter creates your Hunter group; /waf hunter validate checks it. /waf examples adds examples. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
+    Private.PrintHelp()
   else
-    WeakAuras.prettyPrint(L["Forever: /wa opens the editor. /waf hunter creates your Hunter group; /waf hunter validate checks it. /waf examples adds examples. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
+    SlashCmdList.WEAKAURAS(input)
   end
 end

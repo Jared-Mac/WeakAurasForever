@@ -212,6 +212,9 @@ local blockedTables = {
   WeakAurasSaved = true,
   WeakAurasOptions = true,
   WeakAurasOptionsSaved = true,
+  WAFSaved = true,
+  WAFOptionsSaved = true,
+  WAFArchive = true,
   ItemRackUser = true,
   ItemRackEvents = true
 }
@@ -485,6 +488,7 @@ local FakeWeakAurasMixin = {
     ClearAndUpdateOptions = true,
     CreateTemplateView = true,
     FillOptions = true,
+    ForeverSavedVariables = true,
     GetMoverSizerId = true,
     GetNameAndIcon = true,
     GetTriggerCategoryFor = true,

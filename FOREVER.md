@@ -1,4 +1,4 @@
-# WeakAuras Forever experiment
+# WAF — WeakAuras Forever
 
 Local experimental fork, modified 2026-09-20. Upstream WeakAuras remains credited
 and licensed under GPL v2; see LICENSE. This is not an official WeakAuras release.
@@ -9,6 +9,50 @@ Target: WoW Forever 1.60.1, interface 16001.
 
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
+
+## WAF identity: waf.1
+
+The installed runtime is now **WAF**, with **WAFOptions**, **WAFArchive** and
+**WAFModelPaths** supporting addons. `/waf` and `/weakaurasforever` open the
+editor; `/wa` remains an alias. Existing `/waf hunter`, `hunter validate`,
+`examples`, `timer` and `stop` commands still work. Standard commands such as
+`/waf minimap` pass through to the original dispatcher. The editor title,
+launcher and chat prefix use WAF.
+
+The builder retains upstream directory names in this repository for merging,
+maps installed folders and media paths to WAF, and leaves embedded libraries
+unchanged. Package lookups derive from the actual addon name. Named frames,
+the public `WeakAuras` API, aura IDs/UIDs and the import/export format remain
+compatible. This is a renamed fork, not namespace isolation for running another
+copy of WeakAuras alongside it. Upstream credits and GPL v2 remain intact.
+
+### Saved data during the rename
+
+The package includes three small **WAF - Legacy saves** addons under the old
+`WeakAuras`, `WeakAurasOptions` and `WeakAurasArchive` directory names. These
+contain TOC declarations only; the main one also retains legacy media paths
+for saved/imported textures and fonts. They contain no old addon runtime.
+Keep these compatibility loaders enabled. They are required dependencies, so
+their saved data loads before the corresponding WAF addon initializes.
+
+New files are `SavedVariables/WAF.lua`, `WAFOptions.lua` and `WAFArchive.lua`,
+declaring `WAFSaved`, `WAFOptionsSaved` and `WAFArchive`. At the runtime's
+`ADDON_LOADED`, the options addon's own `ADDON_LOADED`, and archive initialization,
+respectively, the new table is adopted if it exists. Only a nil new variable
+falls back to the complete legacy table. An empty new table or empty collection
+never restores old auras. Legacy runtime globals alias the selected tables,
+so the compatibility files also continue to receive the current data on save.
+Custom aura code cannot access the new save globals or the migration helper
+through the sandbox.
+
+No external rewrite of SavedVariables is necessary: a still-running old client
+can flush its last edits on exit, and WAF reads that final save next login.
+Installation backs up the old packages and saved files. It does not create,
+rename, merge or backfill individual auras, including the Hunter preset.
+Completely exit and restart WoW to discover the new addon folders, then use
+`/waf`. First-login migration and a subsequent reload/relog still need native
+client confirmation; local checks exercise save selection, command routing,
+sandbox boundaries, packaged dependencies and Lua 5.1 syntax.
 
 ## Mana texture orientation: forever.7
 
@@ -275,11 +319,12 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-forever.7.zip`.
+Lua 5.1 syntax. Output is `.release/WAF-5.22.0-waf.1.zip`.
 
-Install the four directories into Forever's Interface/AddOns. They use the
-standard WeakAuras names and cannot coexist with a different WeakAuras install.
-AurasForever can remain installed. Restart WoW once to discover new addons.
+Install all seven directories into Forever's Interface/AddOns, replacing the
+old fork directories completely (do not leave old Lua files in the compatibility
+loaders). Do not install another WeakAuras runtime alongside WAF. AurasForever
+can remain installed. Restart WoW once to discover new addons.
 
 1. Run `/waf test` out of combat after login. This creates three separate test
    auras, without replacing existing examples, and opens `/wa`.
