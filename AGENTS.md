@@ -107,6 +107,9 @@ Wrath/Titan. Each package has parallel `.toc` files for these clients.
   `.github/workflows/update-wow-interface.yml` workflow owns their values.
 - Do not assume a WoW API exists on every client. Use the repository's current
   feature checks and compatibility patterns.
+- Forever no longer supplies the global `MouseIsOver`. Use the native
+  `region:IsMouseOver()` method for editor hover checks; do not restore removed
+  Blizzard globals as compatibility shims.
 - Always consult <https://warcraft.wiki.gg/wiki/World_of_Warcraft_API> for
   questions about the WoW API. Each function's page documents its signature,
   behavior, and the client flavors and patch versions that support it. Trust
