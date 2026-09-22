@@ -1,14 +1,14 @@
 ## Interface: 16001
-## Title: WAF Model Paths
-## Author: WAF contributors; The WeakAuras Team (upstream)
-## Version: 5.22.0-waf.1
+## Title: WAForever Model Paths
+## Author: WeakAurasForever contributors; The WeakAuras Team (upstream)
+## Version: 5.22.0-waf.2
 ## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
-## Notes: Model paths for WAF
-## Notes-esES: Las rutas de modelos para WAF
-## Notes-esMX: Las rutas de modelos para WAF
-## Notes-deDE: 3D-Model Pfade für WAF
-## Notes-ruRU: Ссылки на файлы моделей WAF
-## Notes-zhTW: WAF的模組路徑
+## Notes: Model paths for WAForever
+## Notes-esES: Las rutas de modelos para WAForever
+## Notes-esMX: Las rutas de modelos para WAForever
+## Notes-deDE: 3D-Model Pfade für WAForever
+## Notes-ruRU: Ссылки на файлы моделей WAForever
+## Notes-zhTW: WAForever的模組路徑
 ## X-Category: Interface Enhancements
 ## Globe-Main: WAF
 ## DefaultState: Enabled

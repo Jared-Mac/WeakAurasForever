@@ -357,6 +357,7 @@ end
 -- Registered on the existing slash dispatcher table; no new global table.
 SLASH_WEAKAURASFOREVER1 = "/waf"
 SLASH_WEAKAURASFOREVER2 = "/weakaurasforever"
+SLASH_WEAKAURASFOREVER3 = "/waforever"
 SlashCmdList.WEAKAURASFOREVER = function(input)
   local command, key = input:match("^(%S+)%s*(.-)$")
   if not command then
@@ -378,7 +379,7 @@ SlashCmdList.WEAKAURASFOREVER = function(input)
     WeakAuras.prettyPrint(L["Test auras created. Open /waf to edit them. Existing test auras were kept."])
     WeakAuras.OpenOptions()
   elseif command == "help" then
-    WeakAuras.prettyPrint(L["WAF: /waf opens the editor. /waf hunter creates your Hunter group; /waf hunter validate checks it. /waf examples adds examples. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
+    WeakAuras.prettyPrint(L["/waf opens the editor. /waf hunter creates your Hunter group; /waf hunter validate checks it. /waf examples adds examples. /waf timer KEY starts manual timers; /waf stop KEY stops them."])
     Private.PrintHelp()
   else
     SlashCmdList.WEAKAURAS(input)

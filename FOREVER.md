@@ -1,4 +1,4 @@
-# WAF — WeakAuras Forever
+# WeakAurasForever
 
 Local experimental fork, modified 2026-09-20. Upstream WeakAuras remains credited
 and licensed under GPL v2; see LICENSE. This is not an official WeakAuras release.
@@ -10,14 +10,25 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Naming: waf.2
+
+Use **WeakAurasForever** as the full name in the editor title, launcher,
+main addon listing, documentation and distribution ZIP. Use **WAForever**
+in chat prefixes and module labels. **WAF** remains the package identity and
+short command (`/waf`); `/waforever` and `/weakaurasforever` also open the editor.
+
+This update changes branding only. Package folders, SavedVariables names,
+legacy migration, aura IDs and layouts remain stable. The separately reported
+missing Hunter entry in the editor is still under investigation.
+
 ## WAF identity: waf.1
 
 The installed runtime is now **WAF**, with **WAFOptions**, **WAFArchive** and
 **WAFModelPaths** supporting addons. `/waf` and `/weakaurasforever` open the
 editor; `/wa` remains an alias. Existing `/waf hunter`, `hunter validate`,
 `examples`, `timer` and `stop` commands still work. Standard commands such as
-`/waf minimap` pass through to the original dispatcher. The editor title,
-launcher and chat prefix use WAF.
+`/waf minimap` pass through to the original dispatcher. The visible naming is
+updated in waf.2 above.
 
 The builder retains upstream directory names in this repository for merging,
 maps installed folders and media paths to WAF, and leaves embedded libraries
@@ -28,7 +39,7 @@ copy of WeakAuras alongside it. Upstream credits and GPL v2 remain intact.
 
 ### Saved data during the rename
 
-The package includes three small **WAF - Legacy saves** addons under the old
+The package includes three small **WAForever - Legacy saves** addons under the old
 `WeakAuras`, `WeakAurasOptions` and `WeakAurasArchive` directory names. These
 contain TOC declarations only; the main one also retains legacy media paths
 for saved/imported textures and fonts. They contain no old addon runtime.
@@ -319,7 +330,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WAF-5.22.0-waf.1.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-waf.2.zip`.
 
 Install all seven directories into Forever's Interface/AddOns, replacing the
 old fork directories completely (do not leave old Lua files in the compatibility

@@ -389,7 +389,8 @@ local versionString = "@project-version@"
 local buildTime = "@build-time@"
 
 local flavorFromToc = C_AddOns.GetAddOnMetadata(AddonName, "X-Flavor")
-WeakAuras.displayName = flavorFromToc == "Forever" and "WAF" or "WeakAuras"
+WeakAuras.displayName = flavorFromToc == "Forever" and "WeakAurasForever" or "WeakAuras"
+WeakAuras.shortName = flavorFromToc == "Forever" and "WAForever" or "WeakAuras"
 local flavorFromTocToNumber = {
   Forever = 1,
   Vanilla = 1,
@@ -576,7 +577,7 @@ end
 
 ---@param ... string
 WeakAuras.prettyPrint = function(...)
-  print("|cff9900ff" .. WeakAuras.displayName .. ":|r ", ...)
+  print("|cff9900ff" .. WeakAuras.shortName .. ":|r ", ...)
 end
 
 -- Force enable WeakAurasCompanion and Archive because some addon managers interfere with it

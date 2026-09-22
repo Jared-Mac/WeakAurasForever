@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build WAF with pinned, unmodified release libraries and legacy save loaders."""
+"""Build WeakAurasForever with pinned libraries and legacy save loaders."""
 import argparse
 import hashlib
 from pathlib import Path
@@ -11,7 +11,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '5.22.0-waf.1'
+VERSION = '5.22.0-waf.2'
 URL = 'https://github.com/WeakAuras/WeakAuras2/releases/download/5.22.0/WeakAuras-5.22.0.zip'
 SHA256 = '298d3cbaa129af3e734f5bd4f87911acab9b10f10d079004b770fa43980cd4a9'
 PACKAGES = {
@@ -78,8 +78,8 @@ for package, variable in LEGACY_SAVES.items():
     target.mkdir(parents=True, exist_ok=True)
     (target / (package + '.toc')).write_text(
         '## Interface: 16001\n'
-        f'## Title: WAF - Legacy saves ({package})\n'
-        '## Notes: Data-only compatibility loader for WAF. Keep enabled.\n'
+        f'## Title: WAForever - Legacy saves ({package})\n'
+        '## Notes: Data-only compatibility loader for WeakAurasForever. Keep enabled.\n'
         f'## Version: {VERSION}\n'
         '## DefaultState: Enabled\n'
         '## LoadOnDemand: 1\n'
@@ -118,7 +118,7 @@ for package in (*PACKAGES.values(), *LEGACY_SAVES):
         if line and not line.startswith('#'):
             check(toc.parent / line.replace('\\', '/'))
 
-output = ROOT / '.release' / f'WAF-{VERSION}.zip'
+output = ROOT / '.release' / f'WeakAurasForever-{VERSION}.zip'
 with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
     for path in sorted(stage.rglob('*')):
         if path.is_file():
