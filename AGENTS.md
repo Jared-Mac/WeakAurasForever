@@ -24,6 +24,10 @@ identity from the actual addon name. Named frames, public Lua APIs and media
 paths have different compatibility requirements; do not rename them with one
 global text substitution.
 
+Use WeakAurasForever for the full product name, WAForever for compact labels,
+and WAF for package identifiers and the `/waf` command. Branding edits must
+preserve package directories, saved-data paths and user aura names.
+
 The `.toc` files define the load order. Treat this order as an API. When you
 add, remove, or move a Lua file, update every relevant `.toc` file and put the
 file after its dependencies.
