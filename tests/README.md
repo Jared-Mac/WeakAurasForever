@@ -21,6 +21,10 @@ that the escape routes we have found and closed stay closed:
 - `forever_saved_variables_test.lua` checks WAF's save-selection boundary:
   first migration, fresh installs, new saves taking precedence and preservation
   of deletions. It does not emulate WoW's dependency or SavedVariables loader.
+- `forever_spinbox_test.lua` exercises the actual number-control hover callbacks
+  with the retired `MouseIsOver` global absent. Region-query and drawing recorders
+  cover entering/leaving, handle colors and release behavior; they do not
+  construct frames or emulate AceGUI or native hit testing.
 - `common_options_test.lua` checks that the options panel evaluates stored
   custom code only inside the sandbox when it renders the error label under a
   code box.

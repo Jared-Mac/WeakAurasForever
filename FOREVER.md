@@ -10,6 +10,26 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Editor hover compatibility: waf.3
+
+The reported `AceGUIWidget-WeakAurasSpinBox.lua:66` error occurs when entering
+a number control: `Frame_OnEnter` calls `UpdateHandleVisibility`, which called
+the missing global `MouseIsOver`. The handle's hover-color callback used the
+same global. Both now call the region's `IsMouseOver` method, as does Blizzard's
+[InputUtil helper](https://github.com/Gethe/wow-ui-source/blob/4d5d706b8e01c5ebe01c8dd9b7a07151d8d37069/Interface/AddOns/Blizzard_SharedXML/InputUtil.lua#L213).
+The frame picker and both pending-install/update button animations had the
+same obsolete call and use the method too. Widget registration versions are
+incremented; no Blizzard global or embedded library is modified.
+
+The focused callback test reproduced the exact line-66 error before the fix
+and passes afterward with `MouseIsOver` absent. It checks handle visibility,
+hover/drag colors and a single value commit on mouse release. This validates
+the callback logic, not native hit testing or the entire editor. The earlier
+missing Hunter-list entry still needs confirmation in WoW: the supplied stack
+shows a mouse-enter callback, not the aura-list construction coroutine.
+Reload, open `/waf`, and check both the Hunter group and number-control hovering.
+Saved auras, package names and save paths are unchanged.
+
 ## Naming: waf.2
 
 Use **WeakAurasForever** as the full name in the editor title, launcher,
@@ -330,7 +350,7 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-waf.2.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-waf.3.zip`.
 
 Install all seven directories into Forever's Interface/AddOns, replacing the
 old fork directories completely (do not leave old Lua files in the compatibility

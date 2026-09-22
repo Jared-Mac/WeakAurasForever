@@ -6,7 +6,7 @@ local OptionsPrivate = select(2, ...)
 
 local pairs, next, type, unpack = pairs, next, type, unpack
 
-local Type, Version = "WeakAurasPendingInstallButton", 3
+local Type, Version = "WeakAurasPendingInstallButton", 4
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then
@@ -222,7 +222,7 @@ local function Constructor()
   animRotate:SetDuration(1)
   animRotate:SetSmoothing("OUT")
   animGroup:SetScript("OnFinished", function()
-    if (MouseIsOver(update)) then
+    if (update:IsMouseOver()) then
       animGroup:Play()
     end
   end)
