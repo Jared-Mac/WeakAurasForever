@@ -256,12 +256,16 @@ Also check the relevant boundaries:
   reason about the change against the WoW API. When you close a new escape,
   add a case for it. See `tests/README.md`.
 
-Pull-request CI runs Luacheck, the sandbox tests, and a dry-run package
-build. It catches lint errors, known sandbox escapes, and packaging errors,
-but it does not load the addon in WoW, so it cannot prove `.toc` load order.
-Validate load order by inspecting the `.toc` files and by loading the addon
-in the affected clients. Do not say a check passed unless you ran it or
-GitHub reports it as passed.
+The fork's `.github/workflows/forever.yml` runs the Lua 5.1 regression suite
+and `tools/build_forever.py`, then uploads the installable ZIP as an artifact.
+The builder checks TOC/XML file references and Lua syntax; neither check loads
+the addon in WoW. Validate native behavior in the affected client. Do not say
+a check passed unless you ran it or GitHub reports it as passed.
+
+Upstream workflows are restricted to `WeakAuras/WeakAuras2`. Preserve those
+guards: their packager, project IDs, translations, issue automation and release
+notifications belong to upstream. Use the Forever builder for this fork and
+consult `docs/CURSEFORGE.md` before configuring public addon distribution.
 
 ## Git and review
 
