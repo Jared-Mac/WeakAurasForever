@@ -1,56 +1,99 @@
-<div align="center">
+# WeakAurasForever
 
-# WeakAuras
+**Experimental WeakAuras fork for WoW Forever 1.60.1 (interface 16001).**
+Build customizable displays with the familiar WeakAuras editor and a new set of
+triggers designed for Forever's addon restrictions.
 
-[![Build Status](https://github.com/WeakAuras/WeakAuras2/workflows/CI/badge.svg)](https://github.com/WeakAuras/WeakAuras2/actions?workflow=CI)
-[![WeakAuras on Discord](https://img.shields.io/badge/discord-weakauras-738bd7.svg?style=flat)](https://discord.gg/weakauras) [![Patreon](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/weakauras)
+This is an independent community fork of
+[WeakAuras](https://github.com/WeakAuras/WeakAuras2), based on commit
+`91c52bc92f86ae4a5232913039225a0032aca048`. It is not an official WeakAuras release.
+The WeakAuras Team and contributors retain credit for the original work.
 
-![Logo](https://i.imgur.com/wwbxeCG.jpeg)
-</div>
+## What works in the prototype
 
-WeakAuras is a powerful and flexible framework that allows the display of highly customizable graphics on World of Warcraft's user interface to indicate buffs, debuffs, and other relevant information. This addon was created to be a lightweight replacement for Power Auras but has since introduced more functionalities while remaining efficient and easy to use.
+- The WeakAuras editor, groups, anchors, icon/bar styling, text, animations,
+  and import/export for displays created with the Forever sources.
+- Categorized triggers for spells, auras, items, units, player/world state,
+  and timers; All/Any combinations and conditions using readable data.
+- Native cooldown/recharge icons, native player/target aura icons, and a native
+  player mana bar. Protected values stay in Blizzard's display APIs.
+- Ammo and item counts, public spell checks, swing timers, and manual timers.
+- A Hunter starter group with mana, ranged swing, learned core cooldowns,
+  and learned Night Elf racials.
 
-## Features
+**This is an alpha, not full WeakAuras compatibility.** Existing upstream aura
+packs are not supported. Restricted buff data cannot drive missing-buff rules;
+unknown data does not count as a missing buff. Numeric protected cooldowns and
+mana are unavailable to conditions. Native cooldown progress bars, legacy
+combat-log triggers, and boss-mod integrations are not implemented.
 
-* An intuitive and powerful configuration interface
-* Custom textures including all textures from Power Auras and Blizzard's spell alerts
-* Progress bars and textures that show the exact duration of auras
-* Displays based on auras, health, power (mana, rage, soul shards, holy power, etc.), cooldowns, combat events, runes, totems, items, and many other triggers
-* Preset and user-defined animations
-* Custom side-effects such as chat announcements or sounds
-* Grouping, which allows multiple displays to be positioned and configured at the same time
-* CPU optimizations such as conditional loading/unloading of displays, modularity, and prevention of full aura scanning
-* Powerful customization options, such as animation paths, on-show/on-hide code, and custom triggers, for Lua-savvy users
+The latest editor hover fix has local regression coverage; the reported missing
+Hunter group in the editor still needs an in-game retest. See
+[FOREVER.md](FOREVER.md) for implementation details and validation limits.
 
-## Quick Start
+## Build and try it
 
-To open the options window, type `/wa` or `/weakauras` into your chat and hit enter or use the minimap icon.
+Requires Python 3, Git, Lua 5.1, and the `luac5.1` compiler:
 
-## Extensions
+```sh
+lua5.1 tests/run.lua
+python3 tools/build_forever.py
+```
 
-* [WeakAuras Companion](https://weakauras.wtf): This application adds the missing link between Wago.io and the World of Warcraft addon, enabling you to update your auras in a convenient fashion.
-* [WeakAuras_StopMotion](https://www.curseforge.com/wow/addons/weakauras-stop-motion): This addon adds a new region type to WeakAuras that allows for stop motion animations. Stop Motion textures contain each frame of the animation as a separate image. The addon ships with a number of animations and it supports custom textures.
-* [SharedMedia](https://www.curseforge.com/wow/addons/sharedmedia) for more bar textures.
-* [SharedMediaAdditionalFonts](https://www.curseforge.com/wow/addons/shared-media-additional-fonts) for more fonts.
-* [ColorPickerPlus](https://www.curseforge.com/wow/addons/colorpickerplus) for a better version of the WoW color picker that includes class color templates and a copy and paste function.
+The builder downloads the official WeakAuras 5.22.0 release for its embedded
+libraries and verifies a pinned SHA-256 before using them. The resulting
+`.release/WeakAurasForever-5.22.0-waf.3.zip` is the installable archive.
+GitHub's automatic source-code ZIP is not an installable addon.
+The **WAF build** Actions workflow also produces the package as an artifact.
 
-## Documentation
+The current package is intended for manual testing. Back up your addon folders
+and SavedVariables, exit WoW, then extract the ZIP into the Forever client's
+`Interface/AddOns/` directory. It contains seven top-level folders:
 
-For in-depth documentation, see the [wiki](https://github.com/WeakAuras/WeakAuras2/wiki) page.
+```text
+WAF/                 WAFOptions/          WAFArchive/          WAFModelPaths/
+WeakAuras/           WeakAurasOptions/    WeakAurasArchive/
+```
 
-## Examples
+The last three are data-only legacy-save loaders (plus legacy media), required
+for migration from earlier builds. They occupy the original WeakAuras folder
+names: do not install this package over an ordinary WeakAuras installation or
+let an addon manager update those folders as upstream WeakAuras. Keep a separate
+Forever test installation. Another WeakAuras runtime cannot run alongside WAF.
 
-For some examples of what WeakAuras can do, take a look at [wago.io](https://wago.io/) where tons of people upload their creations and even feature complete interfaces utilizing WeakAuras!
+Restart WoW and enable the included modules. Use `/waf` to open the editor.
+`/waforever` and `/weakaurasforever` are aliases.
 
-## Problems
+- `/waf hunter` creates **Forever Hunter** if absent; it preserves an existing pack.
+- `/waf hunter validate` checks the preset structure and live spellbook IDs.
+- `/waf examples` adds example displays without replacing existing names.
 
-* Please see the [wiki](https://github.com/WeakAuras/WeakAuras2/wiki) page.
-* If you've discovered something that's clearly wrong, or if you get an error, please create a [ticket](https://github.com/WeakAuras/WeakAuras2/issues).
-* You're a programmer yourself and want to contribute? Check out our [contributing guidelines](CONTRIBUTING.md) to get started!
-* Feel free to join our [Discord Community](https://discord.gg/weakauras) to talk, get help and discuss everything WeakAuras!
+WAF stores its settings under `WAFSaved`, `WAFOptionsSaved`, and `WAFArchive`.
+Existing WAF data takes precedence over legacy saves, including an empty
+collection. Installation does not restore deleted auras.
 
-## Support
+## Development and publishing
 
-If you want to help out with development without providing code yourself, you can always donate to the WeakAuras project maintainers using PayPal or become a Patreon:
+Source directories retain upstream names to make merging easier. Use
+`tools/build_forever.py` for Forever packaging; `.pkgmeta` and the upstream
+release scripts target ordinary WeakAuras. Upstream workflows are restricted to
+the upstream repository. WAF's workflow validates and builds without publishing
+to CurseForge or sending release notifications.
 
-[![WeakAuras on PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/WeakAuras)  [![Become a Patreon!](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?u=3216523)
+Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md), and
+[tests/README.md](tests/README.md) before contributing. Open issues and pull
+requests in [this fork](https://github.com/Jared-Mac/WeakAurasForever), not in the
+upstream project, for Forever-specific behavior.
+
+[CurseForge readiness and submission draft](docs/CURSEFORGE.md) records the
+remaining work. No CurseForge project has been submitted for this fork.
+
+## License and credits
+
+GNU General Public License version 2; see [LICENSE](LICENSE). Original copyright
+and attribution notices are retained. Embedded libraries and assets retain
+their respective notices. Forever modifications and their dates are recorded
+in Git history and [FOREVER.md](FOREVER.md).
+
+Thanks to the [WeakAuras Team and contributors](https://github.com/WeakAuras/WeakAuras2)
+for the editor and framework on which this work is based.

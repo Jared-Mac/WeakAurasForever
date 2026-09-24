@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   release-notification-output:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
 
     outputs:
@@ -48,6 +49,7 @@ jobs:
             path: twitter_post.txt
 
   discord-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     needs: release-notification-output
 
@@ -66,6 +68,7 @@ jobs:
           embed-description:  ${{needs.release-notification-output.outputs.changeLogText}}
 
   twitter-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     needs: release-notification-output
 
@@ -81,6 +84,7 @@ jobs:
           twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 
   mastodon-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     needs: release-notification-output
 
@@ -94,6 +98,7 @@ jobs:
           message: ${{needs.release-notification-output.outputs.tweetText}}
 
   bluesky-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     needs: release-notification-output
 

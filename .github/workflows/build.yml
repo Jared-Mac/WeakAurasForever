@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   build:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-22.04
 
     steps:
