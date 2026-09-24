@@ -77,10 +77,17 @@ file after its dependencies.
 exported display data also crosses addon versions.
 
 WAF uses its own SavedVariables files and globals, with legacy runtime aliases.
-Its data-only compatibility addons load the previous fork's saved globals.
-An existing WAF table, including an empty table, always takes precedence over
-legacy data. Preserve the complete table on first adoption; never backfill
-individual auras during migration or login.
+Ship only WAF, WAFOptions, WAFArchive and WAFModelPaths; never ship or depend on
+the original WeakAuras package folders. Legacy save migration is an explicit
+offline copy through tools/migrate_legacy_saves.py, not a runtime fallback.
+An existing WAF save, including an empty file or table, always wins. Never
+backfill individual auras during migration or login.
+
+Forever media relocation runs at the modernization boundary on load/import.
+Rewrite only renderer-owned media fields and their condition overrides. Do not
+globally replace strings in persisted auras: IDs, custom Lua, text and arbitrary
+settings can contain paths that are user content. Embedded libraries remain
+unmodified; the builder relocates only addon-owned source media paths.
 
 - Treat persisted table shapes, absent fields, `nil`, and `false` as public
   compatibility behavior.
