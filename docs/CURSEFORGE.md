@@ -12,22 +12,20 @@ the WoW TOC value, not a CurseForge upload API version ID.
 
 ## Work before public distribution
 
-- **Resolve the legacy-folder collision.** Our builder includes `WeakAuras`,
-  `WeakAurasOptions`, and `WeakAurasArchive` to load old saves and preserve media
-  paths. Ordinary WeakAuras owns the same folders. This is a concrete overlap;
-  how the CurseForge client handles this exact ZIP has not been tested.
-  Recommended next change: distribute only the four WAF folders by default,
-  make migration a separate opt-in process, and provide a tested path for
-  imported legacy media. Do not simply remove required loaders from the ZIP;
-  update dependencies and verify migration, empty saves, deletion, and relogging.
+- **Done: standalone packaging.** Since waf.4, the ZIP contains only WAF,
+  WAFOptions, WAFArchive and WAFModelPaths. Legacy TOC dependencies are removed.
+  Existing WAF saves win; migration is an optional offline copy. Typed media
+  paths are modernized on load/import. See [MIGRATION.md](MIGRATION.md).
+  Local regression and package checks cover this boundary; native client and
+  CurseForge-manager installation checks remain part of release validation.
 - **Complete an in-game release pass.** Retest the Hunter group's editor
   visibility after the hover fix; check fresh installation, source switching,
   combat transitions, import/export, reload, and relog. Local checks do not
   establish native UI correctness. Start with an Alpha file while this is pending.
-- **Create a distinct 400 x 400 PNG logo.** Use our own project avatar, not
-  WeakAuras's or Blizzard's logo. Add actual in-game screenshots. CurseForge's
-  [submission guide](https://support.curseforge.com/support/solutions/articles/9000199552)
-  specifies the logo and metadata requirements.
+- **Done: distinct project logo.** The [400 x 400 PNG](../assets/branding/waf-logo-400.png)
+  is ready for the avatar field and also has an in-game TGA export. Add actual
+  in-game screenshots. The [submission guide](https://support.curseforge.com/support/solutions/articles/9000199552)
+  specifies logo and metadata requirements.
 - **Finish the distribution attribution audit.** Keep GPLv2, original notices,
   and bundled-library/asset licenses. Verify modified-file notices and dates
   in the distributed files, not just Git history. Upstream also declares

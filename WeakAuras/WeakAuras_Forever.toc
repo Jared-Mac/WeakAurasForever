@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: WeakAurasForever
 ## Author: WeakAurasForever contributors; The WeakAuras Team (upstream)
-## Version: 5.22.0-waf.3
-## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
+## Version: 5.22.0-waf.4
+## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\WAF.tga
 ## X-Flavor: Forever
 ## Notes: Independent WoW Forever fork of WeakAuras. Open the editor with /waf.
 ## Notes-esES: Potente y completa aplicación que te permitirá mostrar por pantalla múltiples diseños, basados en beneficios, perjuicios y otros activadores.
@@ -12,10 +12,9 @@
 ## Notes-zhTW: 一個強大且全面實用的顯示圖形和訊息基於增益，減益和其它觸發。
 ## X-Category: Interface Enhancements
 ## Globe-Post: WAFOptions, WAFModelPaths
-## X-Website: https://www.curseforge.com/wow/addons/weakauras
+## X-Website: https://github.com/Jared-Mac/WeakAurasForever
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## Dependencies: WeakAuras
 ## SavedVariables: WAFSaved
 ## LoadSavedVariablesFirst: 1
 ## OptionalDeps: Blizzard_AuraContainer, Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core
@@ -25,6 +24,7 @@ embeds_forever.xml
 
 Init.lua
 ForeverSavedVariables.lua
+ForeverMedia.lua
 Compatibility.lua
 locales.xml
 ArchiveTypes\Repository.lua

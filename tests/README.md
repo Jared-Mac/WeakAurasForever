@@ -19,8 +19,14 @@ that the escape routes we have found and closed stay closed:
   edits/deletions. Native mana sink recorders check that opaque inputs are only
   forwarded to Blizzard setters; they do not emulate secret values or rendering.
 - `forever_saved_variables_test.lua` checks WAF's save-selection boundary:
-  first migration, fresh installs, new saves taking precedence and preservation
-  of deletions. It does not emulate WoW's dependency or SavedVariables loader.
+  fresh installs, existing WAF saves and preservation of deletions, including
+  ignoring unrelated legacy globals. It does not emulate WoW's dependency or SavedVariables loader.
+- `forever_media_test.lua` calls the real modernization entry point with
+  current-version displays to check media relocation, condition overrides,
+  idempotence, and preservation of names, custom code and unrelated paths.
+- `migrate_legacy_saves_test.py` exercises the offline helper against temporary
+  files: exact payload preservation, existing/empty targets, malformed sources,
+  repeat runs and sources/targets changing before the write.
 - `forever_spinbox_test.lua` exercises the actual number-control hover callbacks
   with the retired `MouseIsOver` global absent. Region-query and drawing recorders
   cover entering/leaving, handle colors and release behavior; they do not
@@ -42,6 +48,7 @@ the tests need Lua 5.1 or LuaJIT:
 
 ```sh
 lua5.1 tests/run.lua
+python3 -B tests/migrate_legacy_saves_test.py
 ```
 
 or

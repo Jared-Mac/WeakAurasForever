@@ -10,6 +10,41 @@ Target: WoW Forever 1.60.1, interface 16001.
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
 experiment. Its addon files and saved variables are not inputs to this fork.
 
+## Standalone distribution and logo: waf.4
+
+Modified 2026-09-23. The installer now owns exactly four directories: WAF,
+WAFOptions, WAFArchive and WAFModelPaths. The builder no longer produces legacy
+WeakAuras folders, and the Forever TOCs no longer depend on them. Existing
+canonical WAF saves remain authoritative, including an empty table. The runtime
+aliases are retained for the engine, but no legacy global is silently adopted.
+
+The optional `tools/migrate_legacy_saves.py` helper previews offline migration
+from older Forever-fork files. With `--apply`, it copies only missing WAF files,
+renaming the root assignment while leaving the rest of each file unchanged.
+It never evaluates Lua or replaces a target file. See [docs/MIGRATION.md](docs/MIGRATION.md).
+
+`Private.AddMany` and `Private.Add` both call `WeakAuras.PreAdd`, which runs
+`Private.Modernize` before setting up renderers. At the end of modernization,
+Forever now relocates only known media fields (including subregions, actions
+and condition overrides) from the old bundled Media directory to WAF/Media.
+This also covers imported current-version displays and archive restores. It
+leaves aura IDs, text, triggers, custom code and arbitrary settings untouched.
+There is no per-frame rewrite, global API shim or numeric protected-data access.
+
+An original WAF infinity-aura logo is used for the Forever addon listing,
+minimap launcher and editor portrait. Other clients retain upstream branding.
+The generated master and 400-pixel CurseForge avatar are in assets/branding;
+WoW uses a 256-pixel uncompressed TGA. Upstream media and credits are retained.
+
+Regression checks cover the actual current-version modernization entry point,
+empty/deleted save collections, unrelated legacy globals, offline source/target
+races, and byte-preserved payloads. The builder asserts exactly four package
+roots and validates all client load dependencies and Lua 5.1 syntax. Native
+upgrade/relog behavior and the new logo in the client still need in-game review.
+
+The sections below describe earlier builds. Their legacy-loader installation
+instructions are superseded by waf.4 and the migration guide above.
+
 ## Editor hover compatibility: waf.3
 
 The reported `AceGUIWidget-WeakAurasSpinBox.lua:66` error occurs when entering

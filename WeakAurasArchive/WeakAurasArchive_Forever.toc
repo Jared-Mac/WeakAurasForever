@@ -1,9 +1,9 @@
 ## Interface: 16001
 ## Title: WAForever Archive
 ## Author: WeakAurasForever contributors; The WeakAuras Team (upstream)
-## Version: 5.22.0-waf.3
-## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
+## Version: 5.22.0-waf.4
+## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\WAF.tga
 ## LoadOnDemand: 1
 ## SavedVariables: WAFArchive
 ## LoadSavedVariablesFirst: 1
-## Dependencies: WAF, WeakAurasArchive
+## Dependencies: WAF

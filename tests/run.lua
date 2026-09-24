@@ -16,6 +16,7 @@ local tests = {
   "forever_trigger_options_test.lua",
   "forever_hunter_test.lua",
   "forever_saved_variables_test.lua",
+  "forever_media_test.lua",
   "forever_spinbox_test.lua",
 }
 

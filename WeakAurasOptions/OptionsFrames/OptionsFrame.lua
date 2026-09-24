@@ -1,3 +1,4 @@
+-- Forever packaging/branding changes, 2026-09-23. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -123,7 +124,9 @@ function OptionsPrivate.CreateFrame()
   -- Workaround classic issue
 
   local serverDate = C_DateAndTime.GetCurrentCalendarTime()
-  if serverDate.month == 6
+  if WeakAuras.IsForever() then
+    WeakAurasOptionsPortrait:SetTexture([[Interface\AddOns\WeakAuras\Media\Textures\WAF.tga]])
+  elseif serverDate.month == 6
   then
     WeakAurasOptionsPortrait:SetTexture([[Interface\AddOns\WeakAuras\Media\Textures\logo_256_round_pride.tga]])
   else

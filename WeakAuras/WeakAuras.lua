@@ -1161,7 +1161,8 @@ local Broker_WeakAuras;
 Broker_WeakAuras = LDB:NewDataObject("WeakAuras", {
   type = "launcher",
   text = WeakAuras.displayName,
-  icon = "Interface\\AddOns\\WeakAuras\\Media\\Textures\\icon.blp",
+  icon = WeakAuras.IsForever() and "Interface\\AddOns\\WeakAuras\\Media\\Textures\\WAF.tga"
+       or "Interface\\AddOns\\WeakAuras\\Media\\Textures\\icon.blp",
   OnClick = function(self, button)
     if button == 'LeftButton' then
       if(IsShiftKeyDown()) then
@@ -1208,8 +1209,8 @@ Broker_WeakAuras = LDB:NewDataObject("WeakAuras", {
     tooltip_update_frame:SetScript("OnUpdate", nil);
     GameTooltip:Hide();
   end,
-  iconR = 0.6,
-  iconG = 0,
+  iconR = WeakAuras.IsForever() and 1 or 0.6,
+  iconG = WeakAuras.IsForever() and 1 or 0,
   iconB = 1
 });
 
@@ -1227,7 +1228,7 @@ do -- Archive stuff
         end
       end
       if WeakAuras.IsForever() then
-        WeakAurasArchive = WeakAuras.ForeverSavedVariables("Archive", WeakAurasArchive)
+        WeakAurasArchive = WeakAuras.ForeverSavedVariables("Archive")
       end
       if type(WeakAurasArchive) ~= "table" then
         WeakAurasArchive = {}
@@ -1369,7 +1370,7 @@ loadedFrame:SetScript("OnEvent", function(self, event, ...)
   if(event == "ADDON_LOADED") then
     if(... == ADDON_NAME) then
       if WeakAuras.IsForever() then
-        WeakAurasSaved = WeakAuras.ForeverSavedVariables("Saved", WeakAurasSaved)
+        WeakAurasSaved = WeakAuras.ForeverSavedVariables("Saved")
       end
       ---@type WeakAurasSaved
       WeakAurasSaved = WeakAurasSaved or {};

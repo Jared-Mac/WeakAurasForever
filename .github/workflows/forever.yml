@@ -26,6 +26,9 @@ jobs:
       - name: Run regression checks
         run: lua5.1 tests/run.lua
 
+      - name: Verify offline save migration
+        run: python3 -B tests/migrate_legacy_saves_test.py
+
       - name: Build and validate Forever package
         run: python3 tools/build_forever.py
 

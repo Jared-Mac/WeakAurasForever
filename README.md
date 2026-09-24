@@ -1,5 +1,7 @@
 # WeakAurasForever
 
+<img src="assets/branding/waf-logo-400.png" alt="WAF logo" width="200" height="200">
+
 **Experimental WeakAuras fork for WoW Forever 1.60.1 (interface 16001).**
 Build customizable displays with the familiar WeakAuras editor and a new set of
 triggers designed for Forever's addon restrictions.
@@ -37,29 +39,32 @@ Requires Python 3, Git, Lua 5.1, and the `luac5.1` compiler:
 
 ```sh
 lua5.1 tests/run.lua
+python3 -B tests/migrate_legacy_saves_test.py
 python3 tools/build_forever.py
 ```
 
 The builder downloads the official WeakAuras 5.22.0 release for its embedded
 libraries and verifies a pinned SHA-256 before using them. The resulting
-`.release/WeakAurasForever-5.22.0-waf.3.zip` is the installable archive.
+`.release/WeakAurasForever-5.22.0-waf.4.zip` is the installable archive.
 GitHub's automatic source-code ZIP is not an installable addon.
 The **WAF build** Actions workflow also produces the package as an artifact.
 
 The current package is intended for manual testing. Back up your addon folders
 and SavedVariables, exit WoW, then extract the ZIP into the Forever client's
-`Interface/AddOns/` directory. It contains seven top-level folders:
+`Interface/AddOns/` directory. It contains four uniquely named folders:
 
 ```text
-WAF/                 WAFOptions/          WAFArchive/          WAFModelPaths/
-WeakAuras/           WeakAurasOptions/    WeakAurasArchive/
+WAF/    WAFOptions/    WAFArchive/    WAFModelPaths/
 ```
 
-The last three are data-only legacy-save loaders (plus legacy media), required
-for migration from earlier builds. They occupy the original WeakAuras folder
-names: do not install this package over an ordinary WeakAuras installation or
-let an addon manager update those folders as upstream WeakAuras. Keep a separate
-Forever test installation. Another WeakAuras runtime cannot run alongside WAF.
+Existing WAF saves continue to load without conversion. If upgrading from an
+older WAF package, move its three data-only legacy loaders out of AddOns; identify
+these by `## X-WAF-Legacy: 1`, and keep all SavedVariables. If migrating from the
+pre-WAF Forever fork, use the optional offline helper. Follow the
+[migration guide](docs/MIGRATION.md) for both cases.
+
+No folders belong to both projects now, but WAF and original WeakAuras still
+share internal Lua API names. Enable only one runtime in a given game session.
 
 Restart WoW and enable the included modules. Use `/waf` to open the editor.
 `/waforever` and `/weakaurasforever` are aliases.
@@ -69,8 +74,8 @@ Restart WoW and enable the included modules. Use `/waf` to open the editor.
 - `/waf examples` adds example displays without replacing existing names.
 
 WAF stores its settings under `WAFSaved`, `WAFOptionsSaved`, and `WAFArchive`.
-Existing WAF data takes precedence over legacy saves, including an empty
-collection. Installation does not restore deleted auras.
+Only WAF saves are loaded, including an empty collection. Legacy migration is
+explicit and never overwrites an existing WAF save or restores deleted auras.
 
 ## Development and publishing
 

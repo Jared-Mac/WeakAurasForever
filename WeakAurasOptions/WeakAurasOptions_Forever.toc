@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: WAForever Options
 ## Author: WeakAurasForever contributors; The WeakAuras Team (upstream)
-## Version: 5.22.0-waf.3
-## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\icon.blp
+## Version: 5.22.0-waf.4
+## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\WAF.tga
 ## Notes: Options for WAForever
 ## Notes-esES: Opciones para WAForever
 ## Notes-esMX: Opciones para WAForever
@@ -13,7 +13,7 @@
 ## Globe-Main: WAF
 ## DefaultState: Enabled
 ## LoadOnDemand: 1
-## Dependencies: WAF, WeakAurasOptions
+## Dependencies: WAF
 ## SavedVariables: WAFOptionsSaved
 ## LoadSavedVariablesFirst: 1
 

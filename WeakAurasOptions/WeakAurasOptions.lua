@@ -195,7 +195,7 @@ loadedFrame:SetScript("OnEvent", function(self, event, addon)
     if(addon == ADDON_NAME) then
       db = WeakAurasSaved;
       if WeakAuras.IsForever() then
-        WeakAurasOptionsSaved = WeakAuras.ForeverSavedVariables("OptionsSaved", WeakAurasOptionsSaved)
+        WeakAurasOptionsSaved = WeakAuras.ForeverSavedVariables("OptionsSaved")
       end
       WeakAurasOptionsSaved = WeakAurasOptionsSaved or {};
 

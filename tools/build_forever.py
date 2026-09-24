@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build WeakAurasForever with pinned libraries and legacy save loaders."""
+"""Build WeakAurasForever as four standalone packages with pinned libraries."""
 import argparse
 import hashlib
 from pathlib import Path
@@ -11,7 +11,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '5.22.0-waf.3'
+VERSION = '5.22.0-waf.4'
 URL = 'https://github.com/WeakAuras/WeakAuras2/releases/download/5.22.0/WeakAuras-5.22.0.zip'
 SHA256 = '298d3cbaa129af3e734f5bd4f87911acab9b10f10d079004b770fa43980cd4a9'
 PACKAGES = {
@@ -28,11 +28,6 @@ PACKAGE_CASE = {name.lower(): target for name, target in PACKAGES.items()}
 def relocate_media(text):
     return MEDIA_PATH.sub(lambda match: match[1] + PACKAGE_CASE[match[2].lower()], text)
 
-LEGACY_SAVES = {
-    'WeakAuras': 'WeakAurasSaved',
-    'WeakAurasOptions': 'WeakAurasOptionsSaved',
-    'WeakAurasArchive': 'WeakAurasArchive',
-}
 parser = argparse.ArgumentParser()
 parser.add_argument('--dependencies', type=Path, default=Path('/tmp/WeakAuras-5.22.0.zip'))
 args = parser.parse_args()
@@ -69,27 +64,10 @@ with zipfile.ZipFile(args.dependencies) as archive:
 for name in ('LICENSE', 'FOREVER.md'):
     shutil.copyfile(ROOT / name, stage / 'WAF' / name)
 
-# Required, data-only dependencies load legacy globals before WAF initializes.
-# ForeverSavedVariables selects WAF's distinct saved global when it exists.
-# WoW can flush the currently running old fork after this package is installed;
-# the next login reads that final save without an external snapshot race.
-for package, variable in LEGACY_SAVES.items():
-    target = stage / package
-    target.mkdir(parents=True, exist_ok=True)
-    (target / (package + '.toc')).write_text(
-        '## Interface: 16001\n'
-        f'## Title: WAForever - Legacy saves ({package})\n'
-        '## Notes: Data-only compatibility loader for WeakAurasForever. Keep enabled.\n'
-        f'## Version: {VERSION}\n'
-        '## DefaultState: Enabled\n'
-        '## LoadOnDemand: 1\n'
-        f'## SavedVariables: {variable}\n'
-        '## LoadSavedVariablesFirst: 1\n'
-        '## X-WAF-Legacy: 1\n'
-    )
-# Saved/imported auras can contain literal upstream media paths. Preserve those
-# assets without rewriting aura names, custom code, text, or archived payloads.
-shutil.copytree(ROOT / 'WeakAuras' / 'Media', stage / 'WeakAuras' / 'Media')
+shutil.copyfile(ROOT / 'docs' / 'MIGRATION.md', stage / 'WAF' / 'MIGRATION.md')
+
+# Never assign original WeakAuras directories to WAF in an addon manager.
+assert {path.name for path in stage.iterdir()} == set(PACKAGES.values())
 
 # Validate every file reached by each TOC and XML include in client load order.
 seen = set()
@@ -105,9 +83,10 @@ def check(path):
                 check(path.parent / filename.replace('\\', '/'))
     elif path.suffix == '.lua':
         subprocess.run(['luac5.1', '-p', str(path)], check=True, capture_output=True)
-for package in (*PACKAGES.values(), *LEGACY_SAVES):
+for package in PACKAGES.values():
     toc = stage / package / (package + '.toc')
     assert '## Interface: 16001' in toc.read_text()
+    assert f'## Version: {VERSION}' in toc.read_text(), f'Version mismatch: {toc}'
     for line in toc.read_text().splitlines():
         if line.startswith('## Dependencies:'):
             for dependency in line.split(':', 1)[1].split(','):
