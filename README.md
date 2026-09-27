@@ -11,6 +11,11 @@ This is an independent community fork of
 `91c52bc92f86ae4a5232913039225a0032aca048`. It is not an official WeakAuras release.
 The WeakAuras Team and contributors retain credit for the original work.
 
+WeakAurasForever is the active project, replacing the retired standalone
+AurasForever prototype. Development and installation now target this fork.
+See the [migration guide](docs/MIGRATION.md#retiring-the-original-aurasforever)
+to remove the old prototype while keeping its saved layouts as backups.
+
 ## What works in the prototype
 
 - The WeakAuras editor, groups, anchors, icon/bar styling, text, animations,

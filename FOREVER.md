@@ -8,7 +8,10 @@ Base: WeakAuras/WeakAuras2 main, commit
 Target: WoW Forever 1.60.1, interface 16001.
 
 AurasForever v0.17.0 was checkpointed separately at `565a78c` before this
-experiment. Its addon files and saved variables are not inputs to this fork.
+fork. That independent prototype is now retired; WeakAurasForever is the active
+project for all development and installation. Keep the old source and saved
+layouts only as historical backups. Its addon files and saved variables are
+not inputs to this fork. See [the retirement steps](docs/MIGRATION.md#retiring-the-original-aurasforever).
 
 ## Standalone distribution and logo: waf.4
 
@@ -385,12 +388,13 @@ with `/wa`, then use `/waf test` if the editor opens successfully.
 Build with `python3 tools/build_forever.py`. The script uses the official
 WeakAuras 5.22.0 ZIP only for unmodified embedded libraries, verifies its pinned
 SHA256, copies the fork source, and validates all TOC/XML load dependencies and
-Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-waf.3.zip`.
+Lua 5.1 syntax. Output is `.release/WeakAurasForever-5.22.0-waf.4.zip`.
 
-Install all seven directories into Forever's Interface/AddOns, replacing the
-old fork directories completely (do not leave old Lua files in the compatibility
-loaders). Do not install another WeakAuras runtime alongside WAF. AurasForever
-can remain installed. Restart WoW once to discover new addons.
+With WoW closed, install the four WAF directories into Forever's
+`Interface/AddOns`, replacing the old fork directories completely. Follow the
+[migration guide](docs/MIGRATION.md) to retire AurasForever and remove any old
+WAF legacy loaders while preserving saves. Enable only the WAF runtime.
+Restart WoW once to discover the installed addons.
 
 1. Run `/waf test` out of combat after login. This creates three separate test
    auras, without replacing existing examples, and opens `/wa`.
@@ -411,8 +415,9 @@ can remain installed. Restart WoW once to discover new addons.
    if retaining edits matters; the beta's earlier persistence issue is not
    considered resolved by this experiment.
 
-Do not install upstream updates over this experiment. To revert the experiment,
-disable the four WeakAuras addons. `/af` continues to use AurasForever separately.
+Do not install upstream updates over this fork. Use `/waf` for WeakAurasForever;
+the retired AurasForever prototype and its `/af` command are no longer part of
+the active installation.
 
 ## Scope and data boundary
 

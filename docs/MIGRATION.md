@@ -4,6 +4,20 @@ Starting with **5.22.0-waf.4**, the download contains only `WAF`, `WAFOptions`,
 `WAFArchive`, and `WAFModelPaths`. No original WeakAuras folders are installed.
 WAF still shares internal Lua API names with WeakAuras, so enable only one runtime.
 
+## Retiring the original AurasForever
+
+The independent AurasForever prototype is retired. WeakAurasForever, the
+WeakAuras fork in this repository, is the active project.
+
+With WoW closed, move `Interface/AddOns/AurasForever` to a backup outside
+`Interface/AddOns`. Keep its `AurasForever.lua` SavedVariables file and any
+`.bak` file. Install the four WAF folders above and use `/waf`; `/af` belongs
+to the retired prototype.
+
+AurasForever layouts use a separate format. The migration helper below is
+only for earlier builds of the WeakAuras fork and cannot convert
+`AurasForeverDB`. Existing WAF saves remain authoritative.
+
 ## Already using WAF
 
 Your `WAF.lua`, `WAFOptions.lua`, and `WAFArchive.lua` account SavedVariables files
