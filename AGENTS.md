@@ -5,6 +5,11 @@ change code. A more specific `AGENTS.md` can add rules for its own directory.
 
 ## Project map
 
+WeakAurasForever is the active project and replaces the retired, independent
+AurasForever prototype. Target development and installation at this WeakAuras
+fork. Preserve the old prototype's source and saves as historical backups;
+do not reinstall it or treat its saved layouts as WAF-compatible data.
+
 WeakAuras is a World of Warcraft addon written for Lua 5.1. The repository
 ships five addon packages:
 
