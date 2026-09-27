@@ -1,6 +1,17 @@
-# CurseForge readiness
+# CurseForge publishing
 
-Researched 2026-09-23. This is a submission plan, not an approved listing.
+Submission updated 2026-09-27. Project **1713778**, WeakAurasForever, has been
+created. The first file, **8986655**, is **WeakAurasForever 5.22.0-waf.4 Alpha**
+for WoW Forever 1.60.1. Publication is set to automatic after approval.
+The project still requires moderator approval; check the
+[author dashboard](https://authors.curseforge.com/#/projects/1713778/files)
+for current status.
+
+The uploaded ZIP was built from source commit `019a1d8`. Its SHA-256 is
+`ef47a0a8d6dd75756d7dc2a27b88460f5aa5582dc4fea22742360e4190dc21eb`.
+Lua 5.1 regressions, offline migration tests, the package build, and GitHub CI
+passed. All 133 bundled library files match the pinned upstream archive byte
+for byte. Native client validation remains pending.
 
 ## Platform support
 
@@ -93,8 +104,8 @@ Use `python3 tools/build_forever.py`, not GitHub's source ZIP or the upstream
 upstream publishing, issue automation, and notification jobs are guarded to
 run only in `WeakAuras/WeakAuras2`.
 
-After a CurseForge project exists, its numeric project ID and an author upload
-token can support a separate release workflow. Keep the token in a GitHub
+Project ID `1713778` and an author upload token can support a separate release
+workflow. Keep the token in a GitHub
 Actions secret. The [official upload API](https://support.curseforge.com/support/solutions/articles/9000197321)
 accepts a ZIP plus metadata, release type, game versions, changelog and relations.
 Resolve the correct Forever game-version entry using the versions API; do not

@@ -99,7 +99,9 @@ requests in [this fork](https://github.com/Jared-Mac/WeakAurasForever), not in t
 upstream project, for Forever-specific behavior.
 
 [CurseForge readiness and submission draft](docs/CURSEFORGE.md) records the
-remaining work. No CurseForge project has been submitted for this fork.
+remaining work. CurseForge project **1713778** has been created and the first
+Alpha uploaded. See the [author dashboard](https://authors.curseforge.com/#/projects/1713778/files)
+for moderation status.
 
 ## License and credits
 
