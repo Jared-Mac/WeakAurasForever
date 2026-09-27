@@ -2,9 +2,9 @@ name: WAF build
 
 on:
   push:
-    branches: [forever, feat/forever-prototype]
+    branches: [main, forever, feat/forever-prototype]
   pull_request:
-    branches: [forever, feat/forever-prototype]
+    branches: [main, forever, feat/forever-prototype]
   workflow_dispatch:
 
 permissions:

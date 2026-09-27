@@ -84,6 +84,9 @@ explicit and never overwrites an existing WAF save or restores deleted auras.
 
 ## Development and publishing
 
+`main` is the active WAF development branch. Pushes and pull requests to `main`
+run the **WAF build** workflow and produce an installable ZIP.
+
 Source directories retain upstream names to make merging easier. Use
 `tools/build_forever.py` for Forever packaging; `.pkgmeta` and the upstream
 release scripts target ordinary WeakAuras. Upstream workflows are restricted to
