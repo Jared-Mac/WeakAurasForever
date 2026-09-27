@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 ---@type string
 local AddonName = ...
 ---@class Private
@@ -8,6 +9,7 @@ WeakAuras = {}
 ---@type table<string, string>
 WeakAuras.L = {}
 Private.frames = {}
+WeakAuras.addonName = AddonName
 
 --- @alias uid string
 --- @alias auraId string
@@ -382,12 +384,15 @@ Private.frames = {}
 WeakAuras.normalWidth = 1.3
 WeakAuras.halfWidth = WeakAuras.normalWidth / 2
 WeakAuras.doubleWidth = WeakAuras.normalWidth * 2
-local versionStringFromToc = C_AddOns.GetAddOnMetadata("WeakAuras", "Version")
+local versionStringFromToc = C_AddOns.GetAddOnMetadata(AddonName, "Version")
 local versionString = "@project-version@"
 local buildTime = "@build-time@"
 
-local flavorFromToc = C_AddOns.GetAddOnMetadata("WeakAuras", "X-Flavor")
+local flavorFromToc = C_AddOns.GetAddOnMetadata(AddonName, "X-Flavor")
+WeakAuras.displayName = flavorFromToc == "Forever" and "WeakAurasForever" or "WeakAuras"
+WeakAuras.shortName = flavorFromToc == "Forever" and "WAForever" or "WeakAuras"
 local flavorFromTocToNumber = {
+  Forever = 1,
   Vanilla = 1,
   TBC = 2,
   Wrath = 3,
@@ -425,6 +430,10 @@ WeakAuras.newFeatureString = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeat
 WeakAuras.BuildInfo = select(4, GetBuildInfo())
 
 ---@return boolean result
+function WeakAuras.IsForever()
+  return flavorFromToc == "Forever"
+end
+
 function WeakAuras.IsClassicEra()
   return flavor == 1
 end
@@ -568,12 +577,12 @@ end
 
 ---@param ... string
 WeakAuras.prettyPrint = function(...)
-  print("|cff9900ffWeakAuras:|r ", ...)
+  print("|cff9900ff" .. WeakAuras.shortName .. ":|r ", ...)
 end
 
 -- Force enable WeakAurasCompanion and Archive because some addon managers interfere with it
 C_AddOns.EnableAddOn("WeakAurasCompanion")
-C_AddOns.EnableAddOn("WeakAurasArchive")
+C_AddOns.EnableAddOn(AddonName .. "Archive")
 
 local libsAreOk = true
 do
@@ -589,12 +598,14 @@ do
     "LibSharedMedia-3.0",
     "LibDataBroker-1.1",
     "LibCompress",
-    "SpellRange-1.0",
     "LibCustomGlow-1.0",
     "LibDBIcon-1.0",
     "LibGetFrame-1.0",
     "LibSerialize",
   }
+  if not WeakAuras.IsForever() then
+    tinsert(LibStubLibs, "SpellRange-1.0")
+  end
   if WeakAuras.IsRetail() then
     tinsert(LibStubLibs, "LibSpecialization")
     AddonCompartmentFrame:RegisterAddon({

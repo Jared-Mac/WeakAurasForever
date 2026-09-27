@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   permission_check:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     steps:
       - uses: actions-cool/check-user-permission@c21884f3dda18dafc2f8b402fe807ccc9ec1aa5e # v2
@@ -20,6 +21,7 @@ jobs:
       require-result: ${{ steps.check-permission.outputs.require-result }}
 
   build:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-22.04
     needs: [permission_check]
     steps:
@@ -59,6 +61,7 @@ jobs:
           archive: false
 
   sandbox-tests:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -641,6 +642,7 @@ local function modify(parent, region, data)
   end
 
   Private.regionPrototype.modifyFinish(parent, region, data);
+  if WeakAuras.IsForever() then Private.Forever.BindIcon(region, data) end
 
   --- WORKAROUND
   -- This fixes a issue with barmodels not appearing on icons if the

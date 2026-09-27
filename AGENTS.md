@@ -5,6 +5,11 @@ change code. A more specific `AGENTS.md` can add rules for its own directory.
 
 ## Project map
 
+WeakAurasForever is the active project and replaces the retired, independent
+AurasForever prototype. Target development and installation at this WeakAuras
+fork. Preserve the old prototype's source and saves as historical backups;
+do not reinstall it or treat its saved layouts as WAF-compatible data.
+
 WeakAuras is a World of Warcraft addon written for Lua 5.1. The repository
 ships five addon packages:
 
@@ -18,6 +23,16 @@ ships five addon packages:
 - `WeakAurasArchive/` is the load-on-demand saved-variable container for the
   archive.
 
+For Forever, `tools/build_forever.py` maps these source directories to the WAF
+packages described in `FOREVER.md`. Derive addon metadata, loading and event
+identity from the actual addon name. Named frames, public Lua APIs and media
+paths have different compatibility requirements; do not rename them with one
+global text substitution.
+
+Use WeakAurasForever for the full product name, WAForever for compact labels,
+and WAF for package identifiers and the `/waf` command. Branding edits must
+preserve package directories, saved-data paths and user aura names.
+
 The `.toc` files define the load order. Treat this order as an API. When you
 add, remove, or move a Lua file, update every relevant `.toc` file and put the
 file after its dependencies.
@@ -28,6 +43,12 @@ file after its dependencies.
 - Most runtime files use `local Private = select(2, ...)` for internal state
   shared across files. Put public addon APIs on `WeakAuras` and internal APIs
   on `Private`. Do not create another global.
+- `OptionsPrivate.Private` is assigned by `WeakAuras.ToggleOptions` only after
+  `C_AddOns.LoadAddOn("WeakAurasOptions")` finishes loading the options files.
+  Options files may register builders at file scope, but must defer access to
+  the runtime table until those builders run after the assignment. Options tests
+  must load these files with `OptionsPrivate.Private` unset, then connect it
+  before constructing controls.
 - `WeakAuras/Types.lua` and the per-client `WeakAuras/Types_*.lua` files fill
   `Private` with shared option data, such as value lists and their localized
   display names. Each `.toc` loads the flavor file before `Types.lua`. Keep
@@ -46,6 +67,11 @@ file after its dependencies.
 - A runtime region or subregion change often needs a matching change in
   `WeakAurasOptions/RegionOptions/` or `WeakAurasOptions/SubRegionOptions/`.
   Check both sides before you finish.
+- An aurabar's `region.bar` is a Frame with Lua methods and texture masks, not
+  a native StatusBar. When adapting it to native rendering, verify each setter's
+  implementation and semantics instead of assuming matching method names are
+  interchangeable. Its rotation flag, for example, controls orientation-aware
+  UV mapping; native StatusBar rotation is explicit.
 - When changing per-aura state, check both rename and deletion in
   `WeakAuras/WeakAuras.lua`. Keep cached UI rows consistent with the state,
   use the existing lifecycle hooks, and respect their `.toc` load order.
@@ -54,6 +80,19 @@ file after its dependencies.
 
 `WeakAurasSaved` and `WeakAurasArchive` survive addon reloads. Imported and
 exported display data also crosses addon versions.
+
+WAF uses its own SavedVariables files and globals, with legacy runtime aliases.
+Ship only WAF, WAFOptions, WAFArchive and WAFModelPaths; never ship or depend on
+the original WeakAuras package folders. Legacy save migration is an explicit
+offline copy through tools/migrate_legacy_saves.py, not a runtime fallback.
+An existing WAF save, including an empty file or table, always wins. Never
+backfill individual auras during migration or login.
+
+Forever media relocation runs at the modernization boundary on load/import.
+Rewrite only renderer-owned media fields and their condition overrides. Do not
+globally replace strings in persisted auras: IDs, custom Lua, text and arbitrary
+settings can contain paths that are user content. Embedded libraries remain
+unmodified; the builder relocates only addon-owned source media paths.
 
 - Treat persisted table shapes, absent fields, `nil`, and `false` as public
   compatibility behavior.
@@ -80,6 +119,9 @@ Wrath/Titan. Each package has parallel `.toc` files for these clients.
   `.github/workflows/update-wow-interface.yml` workflow owns their values.
 - Do not assume a WoW API exists on every client. Use the repository's current
   feature checks and compatibility patterns.
+- Forever no longer supplies the global `MouseIsOver`. Use the native
+  `region:IsMouseOver()` method for editor hover checks; do not restore removed
+  Blizzard globals as compatibility shims.
 - Always consult <https://warcraft.wiki.gg/wiki/World_of_Warcraft_API> for
   questions about the WoW API. Each function's page documents its signature,
   behavior, and the client flavors and patch versions that support it. Trust
@@ -226,12 +268,16 @@ Also check the relevant boundaries:
   reason about the change against the WoW API. When you close a new escape,
   add a case for it. See `tests/README.md`.
 
-Pull-request CI runs Luacheck, the sandbox tests, and a dry-run package
-build. It catches lint errors, known sandbox escapes, and packaging errors,
-but it does not load the addon in WoW, so it cannot prove `.toc` load order.
-Validate load order by inspecting the `.toc` files and by loading the addon
-in the affected clients. Do not say a check passed unless you ran it or
-GitHub reports it as passed.
+The fork's `.github/workflows/forever.yml` runs the Lua 5.1 regression suite
+and `tools/build_forever.py`, then uploads the installable ZIP as an artifact.
+The builder checks TOC/XML file references and Lua syntax; neither check loads
+the addon in WoW. Validate native behavior in the affected client. Do not say
+a check passed unless you ran it or GitHub reports it as passed.
+
+Upstream workflows are restricted to `WeakAuras/WeakAuras2`. Preserve those
+guards: their packager, project IDs, translations, issue automation and release
+notifications belong to upstream. Use the Forever builder for this fork and
+consult `docs/CURSEFORGE.md` before configuring public addon distribution.
 
 ## Git and review
 

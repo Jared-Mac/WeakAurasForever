@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 ---@type string
 local AddonName = ...
 ---@class Private
@@ -24,7 +25,7 @@ local debugstack = debugstack
 local GetNumTalentTabs, GetNumTalents = GetNumTalentTabs, GetNumTalents
 local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 20
 
-local ADDON_NAME = "WeakAuras"
+local ADDON_NAME = AddonName
 ---@class WeakAuras
 local WeakAuras = WeakAuras
 local L = WeakAuras.L
@@ -143,7 +144,7 @@ do
 end
 
 function Private.LoadOptions(msg)
-  if not(C_AddOns.IsAddOnLoaded("WeakAurasOptions")) then
+  if not(C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "Options")) then
     if not WeakAuras.IsLoginFinished() then
       prettyPrint(Private.LoginMessage())
       loginQueue[#loginQueue + 1] = WeakAuras.OpenOptions
@@ -154,7 +155,7 @@ function Private.LoadOptions(msg)
       Private.frames["Addon Initialization Handler"]:RegisterEvent("PLAYER_REGEN_ENABLED")
       return false;
     else
-      local loaded, reason = C_AddOns.LoadAddOn("WeakAurasOptions");
+      local loaded, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "Options");
       if not(loaded) then
         reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
         WeakAuras.prettyPrint(string.format(L["Options could not be loaded, the addon is %s"], reason));
@@ -982,6 +983,7 @@ end
 Private.talent_types_specific = {}
 Private.pvp_talent_types_specific = {}
 local function CreateTalentCache()
+  if WeakAuras.IsForever() then return end
   local _, player_class = UnitClass("player")
 
   Private.talent_types_specific[player_class] = Private.talent_types_specific[player_class] or {};
@@ -1109,7 +1111,7 @@ local function tooltip_draw(isAddonCompartment, blizzardTooltip)
     tooltip = GameTooltip
   end
   tooltip:ClearLines()
-  tooltip:AddDoubleLine("WeakAuras", versionString)
+  tooltip:AddDoubleLine(WeakAuras.displayName, versionString)
   if Private.CompanionData.slugs then
     local count = Private.CountWagoUpdates()
     if count > 0 then
@@ -1158,8 +1160,9 @@ end
 local Broker_WeakAuras;
 Broker_WeakAuras = LDB:NewDataObject("WeakAuras", {
   type = "launcher",
-  text = "WeakAuras",
-  icon = "Interface\\AddOns\\WeakAuras\\Media\\Textures\\icon.blp",
+  text = WeakAuras.displayName,
+  icon = WeakAuras.IsForever() and "Interface\\AddOns\\WeakAuras\\Media\\Textures\\WAF.tga"
+       or "Interface\\AddOns\\WeakAuras\\Media\\Textures\\icon.blp",
   OnClick = function(self, button)
     if button == 'LeftButton' then
       if(IsShiftKeyDown()) then
@@ -1206,8 +1209,8 @@ Broker_WeakAuras = LDB:NewDataObject("WeakAuras", {
     tooltip_update_frame:SetScript("OnUpdate", nil);
     GameTooltip:Hide();
   end,
-  iconR = 0.6,
-  iconG = 0,
+  iconR = WeakAuras.IsForever() and 1 or 0.6,
+  iconG = WeakAuras.IsForever() and 1 or 0,
   iconB = 1
 });
 
@@ -1217,12 +1220,15 @@ do -- Archive stuff
     if Archivist:IsInitialized() then
       return Archivist
     else
-      if not C_AddOns.IsAddOnLoaded("WeakAurasArchive") then
-        local ok, reason = C_AddOns.LoadAddOn("WeakAurasArchive")
+      if not C_AddOns.IsAddOnLoaded(WeakAuras.addonName .. "Archive") then
+        local ok, reason = C_AddOns.LoadAddOn(WeakAuras.addonName .. "Archive")
         if not ok then
           reason = string.lower("|cffff2020" .. _G["ADDON_" .. reason] .. "|r.")
           error(string.format(L["Could not load WeakAuras Archive, the addon is %s"], reason))
         end
+      end
+      if WeakAuras.IsForever() then
+        WeakAurasArchive = WeakAuras.ForeverSavedVariables("Archive")
       end
       if type(WeakAurasArchive) ~= "table" then
         WeakAurasArchive = {}
@@ -1249,6 +1255,10 @@ function Private.LoginMessage()
 end
 
 local function CheckForPreviousEncounter()
+  if WeakAuras.IsForever() then
+    db.CurrentEncounter = nil
+    return
+  end
   if (UnitAffectingCombat ("player") or InCombatLockdown()) then
     for i = 1, 10 do
       if (UnitExists ("boss" .. i)) then
@@ -1352,13 +1362,16 @@ loadedFrame:RegisterEvent("LOADING_SCREEN_DISABLED");
 if WeakAuras.IsRetail() then
   loadedFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
   loadedFrame:RegisterEvent("PLAYER_PVP_TALENT_UPDATE");
-else
+elseif not WeakAuras.IsForever() then
   loadedFrame:RegisterEvent("CHARACTER_POINTS_CHANGED");
   loadedFrame:RegisterEvent("SPELLS_CHANGED");
 end
 loadedFrame:SetScript("OnEvent", function(self, event, ...)
   if(event == "ADDON_LOADED") then
     if(... == ADDON_NAME) then
+      if WeakAuras.IsForever() then
+        WeakAurasSaved = WeakAuras.ForeverSavedVariables("Saved")
+      end
       ---@type WeakAurasSaved
       WeakAurasSaved = WeakAurasSaved or {};
       db = WeakAurasSaved;
@@ -1649,6 +1662,44 @@ local function scanForLoadsImpl(toCheck, event, arg1, ...)
   end
 
   toCheck = toCheck or loadEvents[event or "SCAN_ALL"]
+  if WeakAuras.IsForever() then
+    if not toCheck then return end
+    local inCombat = InCombatLockdown()
+    local parentsToCheck = {}
+    wipe(toLoad)
+    wipe(toUnload)
+    for id in pairs(toCheck) do
+      local data = WeakAuras.GetData(id)
+      if data and not data.controlledChildren then
+        local shouldLoad = loadFuncs[id] and loadFuncs[id]("ScanForLoads_Auras", inCombat)
+        local couldLoad = loadFuncsForOptions[id] and loadFuncsForOptions[id]("ScanForLoads_Auras", inCombat)
+        if shouldLoad and not loaded[id] then
+          toLoad[id] = true
+          Private.EnsureRegion(id)
+        elseif loaded[id] and not shouldLoad then
+          toUnload[id] = true
+        end
+        if toLoad[id] or toUnload[id] then
+          for parent in Private.TraverseParents(data) do
+            parentsToCheck[parent.id] = true
+          end
+        end
+        if shouldLoad then loaded[id] = true
+        elseif couldLoad then loaded[id] = false
+        else loaded[id] = nil end
+      end
+    end
+    if not paused and (next(toLoad) or next(toUnload)) then
+      Private.LoadDisplays(toLoad, event, arg1, ...)
+      Private.UnloadDisplays(toUnload, event, arg1, ...)
+      Private.FinishLoadUnload()
+    end
+    Private.ScanForLoadsGroup(parentsToCheck)
+    Private.callbacks:Fire("ScanForLoads")
+    wipe(toLoad)
+    wipe(toUnload)
+    return
+  end
 
   -- PET_BATTLE_CLOSE fires twice at the end of a pet battle. IsInBattle evaluates to TRUE during the
   -- first firing, and FALSE during the second. I am not sure if this check is necessary, but the
@@ -1865,55 +1916,60 @@ end
 local loadFrame = CreateFrame("Frame");
 Private.frames["Display Load Handling"] = loadFrame;
 
-loadFrame:RegisterEvent("ENCOUNTER_START");
-loadFrame:RegisterEvent("ENCOUNTER_END");
+if not WeakAuras.IsForever() then
+  loadFrame:RegisterEvent("ENCOUNTER_START");
+  loadFrame:RegisterEvent("ENCOUNTER_END");
 
-if WeakAuras.IsRetail() then
-  loadFrame:RegisterEvent("PLAYER_TALENT_UPDATE");
-  loadFrame:RegisterEvent("PLAYER_PVP_TALENT_UPDATE");
-  loadFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED");
-  loadFrame:RegisterEvent("PET_BATTLE_OPENING_START");
-  loadFrame:RegisterEvent("PET_BATTLE_CLOSE");
-  loadFrame:RegisterEvent("VEHICLE_UPDATE");
-  loadFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-  loadFrame:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
-  loadFrame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
-  loadFrame:RegisterEvent("CHALLENGE_MODE_START")
-  loadFrame:RegisterEvent("TRAIT_CONFIG_CREATED")
-  loadFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+  if WeakAuras.IsRetail() then
+    loadFrame:RegisterEvent("PLAYER_TALENT_UPDATE");
+    loadFrame:RegisterEvent("PLAYER_PVP_TALENT_UPDATE");
+    loadFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED");
+    loadFrame:RegisterEvent("PET_BATTLE_OPENING_START");
+    loadFrame:RegisterEvent("PET_BATTLE_CLOSE");
+    loadFrame:RegisterEvent("VEHICLE_UPDATE");
+    loadFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+    loadFrame:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
+    loadFrame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+    loadFrame:RegisterEvent("CHALLENGE_MODE_START")
+    loadFrame:RegisterEvent("TRAIT_CONFIG_CREATED")
+    loadFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+  else
+    loadFrame:RegisterEvent("CHARACTER_POINTS_CHANGED")
+    loadFrame:RegisterEvent("PLAYER_TALENT_UPDATE");
+    loadFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+  end
+
+  if WeakAuras.IsTBCOrWrathOrCataOrMists() then
+    loadFrame:RegisterEvent("VEHICLE_UPDATE");
+    loadFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+    loadFrame:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
+  end
+
+  if WeakAuras.IsMists() then
+    loadFrame:RegisterEvent("PET_BATTLE_OPENING_START");
+    loadFrame:RegisterEvent("PET_BATTLE_CLOSE");
+  end
+  loadFrame:RegisterEvent("GROUP_ROSTER_UPDATE");
+  loadFrame:RegisterEvent("ZONE_CHANGED");
+  loadFrame:RegisterEvent("ZONE_CHANGED_INDOORS");
+  loadFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+  loadFrame:RegisterEvent("PLAYER_LEVEL_UP");
+  loadFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+  loadFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
+  loadFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED");
+  loadFrame:RegisterEvent("SPELLS_CHANGED");
+  loadFrame:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player")
+  loadFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+  loadFrame:RegisterEvent("PLAYER_DEAD")
+  loadFrame:RegisterEvent("PLAYER_ALIVE")
+  loadFrame:RegisterEvent("PLAYER_UNGHOST")
+  loadFrame:RegisterEvent("PARTY_LEADER_CHANGED")
+  loadFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
+  loadFrame:RegisterEvent("PLAYER_GUILD_UPDATE")
 else
-  loadFrame:RegisterEvent("CHARACTER_POINTS_CHANGED")
-  loadFrame:RegisterEvent("PLAYER_TALENT_UPDATE");
-  loadFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
+  loadFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+  loadFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
-
-if WeakAuras.IsTBCOrWrathOrCataOrMists() then
-  loadFrame:RegisterEvent("VEHICLE_UPDATE");
-  loadFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-  loadFrame:RegisterEvent("UPDATE_OVERRIDE_ACTIONBAR");
-end
-
-if WeakAuras.IsMists() then
-  loadFrame:RegisterEvent("PET_BATTLE_OPENING_START");
-  loadFrame:RegisterEvent("PET_BATTLE_CLOSE");
-end
-loadFrame:RegisterEvent("GROUP_ROSTER_UPDATE");
-loadFrame:RegisterEvent("ZONE_CHANGED");
-loadFrame:RegisterEvent("ZONE_CHANGED_INDOORS");
-loadFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
-loadFrame:RegisterEvent("PLAYER_LEVEL_UP");
-loadFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
-loadFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
-loadFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED");
-loadFrame:RegisterEvent("SPELLS_CHANGED");
-loadFrame:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player")
-loadFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-loadFrame:RegisterEvent("PLAYER_DEAD")
-loadFrame:RegisterEvent("PLAYER_ALIVE")
-loadFrame:RegisterEvent("PLAYER_UNGHOST")
-loadFrame:RegisterEvent("PARTY_LEADER_CHANGED")
-loadFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
-loadFrame:RegisterEvent("PLAYER_GUILD_UPDATE")
 
 if WeakAuras.IsRetail() then
   Private.callbacks:RegisterCallback("WA_DRAGONRIDING_UPDATE", function ()
@@ -1926,7 +1982,9 @@ end
 local unitLoadFrame = CreateFrame("Frame");
 Private.frames["Display Load Handling 2"] = unitLoadFrame;
 
-unitLoadFrame:RegisterUnitEvent("UNIT_FLAGS", "player");
+if not WeakAuras.IsForever() then
+  unitLoadFrame:RegisterUnitEvent("UNIT_FLAGS", "player")
+end
 if WeakAuras.IsTBCOrWrathOrCataOrMistsOrRetail() then
   unitLoadFrame:RegisterUnitEvent("UNIT_ENTERED_VEHICLE", "player");
   unitLoadFrame:RegisterUnitEvent("UNIT_EXITED_VEHICLE", "player");
@@ -1940,15 +1998,17 @@ function Private.RegisterLoadEvents()
     Private.StopProfileSystem("load");
   end);
 
-  C_Timer.NewTicker(0.5, function()
-    Private.StartProfileSystem("load");
-    local zoneId = C_Map.GetBestMapForUnit("player");
-    if loadFrame.zoneId ~= zoneId then
-      Private.ScanForLoads(nil, "ZONE_CHANGED")
-      loadFrame.zoneId = zoneId;
-    end
-    Private.StopProfileSystem("load");
-  end)
+  if not WeakAuras.IsForever() then
+    C_Timer.NewTicker(0.5, function()
+      Private.StartProfileSystem("load");
+      local zoneId = C_Map.GetBestMapForUnit("player");
+      if loadFrame.zoneId ~= zoneId then
+        Private.ScanForLoads(nil, "ZONE_CHANGED")
+        loadFrame.zoneId = zoneId;
+      end
+      Private.StopProfileSystem("load");
+    end)
+  end
 
   unitLoadFrame:SetScript("OnEvent", function(frame, e, arg1, ...)
     Private.StartProfileSystem("load");
@@ -4200,6 +4260,14 @@ function Private.GetTriggerConditions(data)
         end,
 
       }
+      if WeakAuras.IsForever() and data.triggers[i].trigger.type == "forever" then
+        if Private.Forever.IsNative(data.triggers[i].trigger) then
+          conditions[i].show = nil
+          conditions[i].activationTime = nil
+        else
+          conditions[i].show.test = Private.Forever.ActiveCondition(data, i)
+        end
+      end
     end
   end
   return conditions;

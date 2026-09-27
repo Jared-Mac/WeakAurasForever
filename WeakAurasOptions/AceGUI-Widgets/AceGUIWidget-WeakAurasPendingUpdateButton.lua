@@ -7,7 +7,7 @@ local L = WeakAuras.L
 
 local pairs, next, type, unpack = pairs, next, type, unpack
 
-local Type, Version = "WeakAurasPendingUpdateButton", 6
+local Type, Version = "WeakAurasPendingUpdateButton", 7
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 
@@ -345,7 +345,7 @@ local function Constructor()
   animRotate:SetDuration(1)
   animRotate:SetSmoothing("OUT")
   animGroup:SetScript("OnFinished", function()
-    if (MouseIsOver(update)) then
+    if (update:IsMouseOver()) then
       animGroup:Play()
     end
   end)

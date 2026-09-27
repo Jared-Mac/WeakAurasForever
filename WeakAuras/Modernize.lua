@@ -1,3 +1,4 @@
+-- Forever packaging/branding changes, 2026-09-23. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then
   return
 end
@@ -2499,6 +2500,11 @@ function Private.Modernize(data, oldSnapshot)
     end
   end
 
+  -- Apply on every load/import, including current-version auras and restores.
+  -- Only the Forever TOC loads the relocation helper.
+  if WeakAuras.IsForever() then
+    Private.RelocateForeverMedia(data)
+  end
   data.internalVersion = max(data.internalVersion or 0, WeakAuras.InternalVersion())
 end
 

@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   auto_close_issues:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

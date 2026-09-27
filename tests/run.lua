@@ -11,6 +11,13 @@ require("helpers") -- exits with a clear message on an unsupported Lua version
 local tests = {
   "aura_environment_test.lua",
   "common_options_test.lua",
+  "forever_spell_cache_test.lua",
+  "forever_state_test.lua",
+  "forever_trigger_options_test.lua",
+  "forever_hunter_test.lua",
+  "forever_saved_variables_test.lua",
+  "forever_media_test.lua",
+  "forever_spinbox_test.lua",
 }
 
 local interpreter = arg[-1]

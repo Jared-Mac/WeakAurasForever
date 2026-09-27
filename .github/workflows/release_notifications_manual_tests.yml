@@ -16,6 +16,7 @@ jobs:
 
   # "release-notification" is a job, you can name it anything you want
   test-release-notification-output:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     # we can run our steps on pretty much anything, but the "ubuntu-latest" image is a safe bet
     runs-on: ubuntu-latest
 
@@ -59,6 +60,7 @@ jobs:
 
 ############### DISCORD ####################
   test-discord-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     # we can run our steps on pretty much anything, but the "ubuntu-latest" image is a safe bet
     runs-on: ubuntu-latest
     needs: test-release-notification-output
@@ -81,6 +83,7 @@ jobs:
 
 ############### TWITTER ####################
   test-twitter-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     # we can run our steps on pretty much anything, but the "ubuntu-latest" image is a safe bet
     runs-on: ubuntu-latest
     needs: test-release-notification-output
@@ -98,6 +101,7 @@ jobs:
 
 ############### MASTODON ####################
   test-mastodon-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     # we can run our steps on pretty much anything, but the "ubuntu-latest" image is a safe bet
     runs-on: ubuntu-latest
     needs: test-release-notification-output
@@ -114,6 +118,7 @@ jobs:
 
 ############### BLUESKY ####################
   test-bluesky-release-notification:
+    if: github.repository == 'WeakAuras/WeakAuras2'
     # we can run our steps on pretty much anything, but the "ubuntu-latest" image is a safe bet
     runs-on: ubuntu-latest
     needs: test-release-notification-output

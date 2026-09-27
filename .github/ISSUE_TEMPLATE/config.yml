@@ -1,5 +1,5 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: Question
-    url:  https://discord.gg/weakauras
-    about: Please ask and answer questions here.
+  - name: Forever compatibility and known limitations
+    url: https://github.com/Jared-Mac/WeakAurasForever/blob/forever/FOREVER.md
+    about: Read the current prototype scope and validation notes before reporting a problem.

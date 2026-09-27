@@ -1,0 +1,18 @@
+## Interface: 16001
+## Title: WAForever Model Paths
+## Author: WeakAurasForever contributors; The WeakAuras Team (upstream)
+## Version: 5.22.0-waf.4
+## IconTexture: Interface\AddOns\WeakAuras\Media\Textures\WAF.tga
+## Notes: Model paths for WAForever
+## Notes-esES: Las rutas de modelos para WAForever
+## Notes-esMX: Las rutas de modelos para WAForever
+## Notes-deDE: 3D-Model Pfade für WAForever
+## Notes-ruRU: Ссылки на файлы моделей WAForever
+## Notes-zhTW: WAForever的模組路徑
+## X-Category: Interface Enhancements
+## Globe-Main: WAF
+## DefaultState: Enabled
+## LoadOnDemand: 1
+## Dependencies: WAF, WAFOptions
+
+ModelPathsClassicEra.lua

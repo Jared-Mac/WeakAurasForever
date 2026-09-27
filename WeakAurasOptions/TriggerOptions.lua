@@ -1,3 +1,4 @@
+-- Forever compatibility changes, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -134,7 +135,7 @@ local function AddOptions(allOptions, data)
           {
             trigger =
             {
-              type = "aura2"
+              type = WeakAuras.IsForever() and "forever" or "aura2"
             },
             untrigger = {
             }
@@ -295,14 +296,16 @@ function OptionsPrivate.GetTriggerTitle(data, triggernum)
   if data.triggers[triggernum] then
     local trigger = data.triggers[triggernum].trigger
     if trigger then
-      local event_prototype = OptionsPrivate.Private.event_prototypes[trigger.event]
       local triggerType = trigger.type
       local name
       if triggerType == "aura2" then
         name = L["Aura"]
       elseif triggerType == "custom" then
         name = L["Custom"]
+      elseif triggerType == "forever" and WeakAuras.IsForever() then
+        name = OptionsPrivate.Private.Forever.sourceNames[trigger.source or "ammo"] or L["Forever"]
       else
+        local event_prototype = OptionsPrivate.Private.event_prototypes[trigger.event]
         name = event_prototype.name
       end
       return L["Trigger %i: %s"]:format(triggernum, name)
@@ -411,7 +414,7 @@ function OptionsPrivate.AddTriggerMetaFunctions(options, data, triggernum)
       end
     end
   }
-  if (C_AddOns.GetAddOnEnableState("WeakAurasTemplates") ~= Enum.AddOnEnableState.None) then
+  if (C_AddOns.GetAddOnEnableState(WeakAuras.addonName .. "Templates") ~= Enum.AddOnEnableState.None) then
     options.__applyTemplate = function()
       -- If we have more than a single aura selected,
       -- we want to open the template view with the group/multi selection

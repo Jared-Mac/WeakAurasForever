@@ -10,6 +10,9 @@ stubs.install()
 local realG = _G
 _G.WeakAuras = stubs.newWeakAuras()
 local WeakAuras = _G.WeakAuras
+WeakAuras.addonName = "WAF"
+T.loadAddonFile("WeakAuras/ForeverSavedVariables.lua", "WAF", {})
+WAFSaved, WAFOptionsSaved, WAFArchive = {}, {}, {}
 local Private, warnings = stubs.newPrivate()
 
 local auraData = { id = "test", uid = "test-uid", config = {}, information = {}, actions = {} }
@@ -63,12 +66,15 @@ for _, name in ipairs({ "loadstring", "getfenv", "setfenv", "pcall", "xpcall",
   T.expect(type(got) == "function" and got ~= realG[name], name .. " is replaced by a stub")
   T.expect(warned("SandboxForbidden"), name .. " raises a SandboxForbidden warning")
 end
-for _, name in ipairs({ "SlashCmdList", "WeakAurasSaved", "WeakAurasOptions" }) do
+for _, name in ipairs({ "SlashCmdList", "WeakAurasSaved", "WeakAurasOptions",
+                        "WAFSaved", "WAFOptionsSaved", "WAFArchive" }) do
   clearWarnings()
   local got = runCustom("return " .. name)
   T.expect(type(got) == "table" and got ~= realG[name], name .. " is replaced by an empty table")
   T.expect(warned("SandboxForbidden"), name .. " raises a SandboxForbidden warning")
 end
+T.expect(runCustom('return WeakAuras.ForeverSavedVariables("Saved")') == nil,
+         "custom code cannot call the save migration helper")
 
 T.section("_G and getglobal resolve to the sandbox")
 T.expect(runCustom("return _G") ~= realG, "_G is not the real global table")
@@ -88,6 +94,8 @@ local probes = {
   { 'getglobal("WeakAuras.PreAdd")', WeakAuras.PreAdd },
   { '_G["_G.WeakAuras.HideOptions"]', WeakAuras.HideOptions },
   { '_G["_G.WeakAurasSaved"]', realG.WeakAurasSaved },
+  { 'getglobal("_G.WAFSaved")', realG.WAFSaved },
+  { '_G["WeakAuras.ForeverSavedVariables"]', WeakAuras.ForeverSavedVariables },
   { '_G["_G._G._G.loadstring"]', loadstring },
 }
 for _, probe in ipairs(probes) do

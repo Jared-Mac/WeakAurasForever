@@ -1,3 +1,4 @@
+-- Forever packaging/branding changes, 2026-09-23. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...
@@ -107,7 +108,7 @@ function OptionsPrivate.CreateFrame()
   frame.Bg.colorTexture = {r, g, b, 0.8}
 
   function OptionsPrivate.SetTitle(title)
-    local text = "WeakAuras " .. WeakAuras.versionString
+    local text = WeakAuras.displayName .. " " .. WeakAuras.versionString
     if title and title ~= "" then
       text = ("%s - %s"):format(text, title)
     end
@@ -123,7 +124,9 @@ function OptionsPrivate.CreateFrame()
   -- Workaround classic issue
 
   local serverDate = C_DateAndTime.GetCurrentCalendarTime()
-  if serverDate.month == 6
+  if WeakAuras.IsForever() then
+    WeakAurasOptionsPortrait:SetTexture([[Interface\AddOns\WeakAuras\Media\Textures\WAF.tga]])
+  elseif serverDate.month == 6
   then
     WeakAurasOptionsPortrait:SetTexture([[Interface\AddOns\WeakAuras\Media\Textures\logo_256_round_pride.tga]])
   else
@@ -1367,7 +1370,7 @@ function OptionsPrivate.CreateFrame()
     containerScroll:SetLayout("flow")
     border:AddChild(containerScroll)
 
-    if C_AddOns.GetAddOnEnableState("WeakAurasTemplates") ~= Enum.AddOnEnableState.None then
+    if C_AddOns.GetAddOnEnableState(WeakAuras.addonName .. "Templates") ~= Enum.AddOnEnableState.None then
       local simpleLabel = AceGUI:Create("Label")
       simpleLabel:SetFont(STANDARD_TEXT_FONT, 24, "OUTLINE")
       simpleLabel:SetColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)

@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       ${{
+        github.repository == 'WeakAuras/WeakAuras2' &&
         github.event.workflow_run.event == 'pull_request' &&
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.pull_requests[0]
