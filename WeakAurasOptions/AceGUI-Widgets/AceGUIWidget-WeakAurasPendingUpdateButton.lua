@@ -1,3 +1,4 @@
+-- Forever pending-update hover compatibility, 2026-09-21. See WAF/FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...

@@ -105,8 +105,9 @@ remaining work. No CurseForge project has been submitted for this fork.
 
 GNU General Public License version 2; see [LICENSE](LICENSE). Original copyright
 and attribution notices are retained. Embedded libraries and assets retain
-their respective notices. Forever modifications and their dates are recorded
-in Git history and [FOREVER.md](FOREVER.md).
+their respective notices. Modified files carry dated fork notices. See the
+[distribution credits](docs/ATTRIBUTION.md), Git history, and
+[FOREVER.md](FOREVER.md) for the changes and their dates.
 
 Thanks to the [WeakAuras Team and contributors](https://github.com/WeakAuras/WeakAuras2)
 for the editor and framework on which this work is based.

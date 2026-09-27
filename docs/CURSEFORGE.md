@@ -26,9 +26,10 @@ the WoW TOC value, not a CurseForge upload API version ID.
   is ready for the avatar field and also has an in-game TGA export. Add actual
   in-game screenshots. The [submission guide](https://support.curseforge.com/support/solutions/articles/9000199552)
   specifies logo and metadata requirements.
-- **Finish the distribution attribution audit.** Keep GPLv2, original notices,
-  and bundled-library/asset licenses. Verify modified-file notices and dates
-  in the distributed files, not just Git history. Upstream also declares
+- **Done: distribution attribution review, 2026-09-27.** The package includes
+  GPLv2, original notices, bundled-library/asset licenses, and
+  [distribution credits](ATTRIBUTION.md). Modified files carry dated notices,
+  including files whose media paths change during packaging. Upstream also declares
   [GPLv2 on CurseForge](https://www.curseforge.com/wow/addons/weakauras-2).
   Fork descriptions must explain the changes and credit/link the original;
   see the [moderation policy](https://support.curseforge.com/support/solutions/articles/9000197279).

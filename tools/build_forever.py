@@ -51,7 +51,19 @@ for name in tracked:
     target = stage / PACKAGES[package] / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     if source.suffix in ('.lua', '.xml', '.toc'):
-        target.write_text(relocate_media(source.read_text()))
+        original = source.read_text()
+        relocated = relocate_media(original)
+        if relocated != original:
+            notice = 'WeakAurasForever media path modifications, 2026-09-23. See WAF/ATTRIBUTION.md.'
+            if source.suffix == '.lua':
+                relocated = '-- ' + notice + '\n' + relocated
+            elif source.suffix == '.toc':
+                relocated = '# ' + notice + '\n' + relocated
+            else:
+                declaration = re.match(r'<\?xml[^>]*\?>\s*', relocated)
+                offset = declaration.end() if declaration else 0
+                relocated = relocated[:offset] + '<!-- ' + notice + ' -->\n' + relocated[offset:]
+        target.write_text(relocated)
     else:
         shutil.copyfile(source, target)
 with zipfile.ZipFile(args.dependencies) as archive:
@@ -64,7 +76,8 @@ with zipfile.ZipFile(args.dependencies) as archive:
 for name in ('LICENSE', 'FOREVER.md'):
     shutil.copyfile(ROOT / name, stage / 'WAF' / name)
 
-shutil.copyfile(ROOT / 'docs' / 'MIGRATION.md', stage / 'WAF' / 'MIGRATION.md')
+for name in ('MIGRATION.md', 'ATTRIBUTION.md'):
+    shutil.copyfile(ROOT / 'docs' / name, stage / 'WAF' / name)
 
 # Never assign original WeakAuras directories to WAF in an addon manager.
 assert {path.name for path in stage.iterdir()} == set(PACKAGES.values())

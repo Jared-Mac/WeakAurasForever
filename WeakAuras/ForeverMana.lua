@@ -1,4 +1,4 @@
--- Forever native mana rendering. See FOREVER.md for the restricted-data boundary.
+-- Forever native mana rendering, 2026-09-20. See FOREVER.md for the restricted-data boundary.
 if not WeakAuras.IsLibsOK() then return end
 local Private = select(2, ...)
 local F = Private.Forever

@@ -1,3 +1,4 @@
+-- Forever options package identity and saved data, 2026-09-23. See WAF/FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...

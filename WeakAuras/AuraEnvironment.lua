@@ -1,3 +1,4 @@
+-- Forever sandbox and saved-variable boundaries, 2026-09-20. See FOREVER.md.
 if not WeakAuras.IsLibsOK() then return end
 ---@type string
 local AddonName = ...

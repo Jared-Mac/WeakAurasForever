@@ -1,4 +1,4 @@
--- Explicit, non-destructive character presets for the Forever experiment.
+-- Explicit, non-destructive character presets for Forever, 2026-09-20.
 if not WeakAuras.IsLibsOK() then return end
 local Private = select(2, ...)
 local F, L = Private.Forever, WeakAuras.L
